@@ -1,9 +1,14 @@
 package com.manuel.gym_api.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ExerciseDTO {
 
 	private Long id;
+	@NotBlank(message = "Name is required")
 	private String name;
+
+	@NotBlank(message = "Muscle group is required")
 	private String muscleGroup;
 
 	public ExerciseDTO() {

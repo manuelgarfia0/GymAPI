@@ -11,6 +11,7 @@ import com.manuel.gym_api.repository.ExerciseRepository;
 
 @Service
 public class ExerciseService {
+
 	private final ExerciseRepository repository;
 
 	public ExerciseService(ExerciseRepository repository) {
@@ -27,15 +28,20 @@ public class ExerciseService {
 		return ExerciseMapper.toDTO(exercise);
 	}
 
-	public void deleteExercise(Long id) {
-		repository.deleteById(id);
-	}
-
 	public ExerciseDTO saveExercise(ExerciseDTO dto) {
 
 		Exercise exercise = ExerciseMapper.toEntity(dto);
 		Exercise saved = repository.save(exercise);
 
 		return ExerciseMapper.toDTO(saved);
+	}
+
+	public void deleteExercise(Long id) {
+
+		if (!repository.existsById(id)) {
+			throw new RuntimeException("Exercise not found");
+		}
+
+		repository.deleteById(id);
 	}
 }
