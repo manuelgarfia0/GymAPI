@@ -8,14 +8,17 @@ import com.manuel.gym_api.dto.ExerciseDTO;
 import com.manuel.gym_api.mapper.ExerciseMapper;
 import com.manuel.gym_api.model.Exercise;
 import com.manuel.gym_api.repository.ExerciseRepository;
+import com.manuel.gym_api.repository.MuscleRepository;
 
 @Service
 public class ExerciseService {
 
 	private final ExerciseRepository repository;
+	private final MuscleRepository muscleRepository;
 
-	public ExerciseService(ExerciseRepository repository) {
+	public ExerciseService(ExerciseRepository repository, MuscleRepository muscleRepository) {
 		this.repository = repository;
+		this.muscleRepository = muscleRepository;
 	}
 
 	public List<ExerciseDTO> getAllExercises() {
@@ -30,7 +33,8 @@ public class ExerciseService {
 
 	public ExerciseDTO saveExercise(ExerciseDTO dto) {
 
-		Exercise exercise = ExerciseMapper.toEntity(dto);
+		Exercise exercise = ExerciseMapper.toEntity(dto, muscleRepository);
+
 		Exercise saved = repository.save(exercise);
 
 		return ExerciseMapper.toDTO(saved);

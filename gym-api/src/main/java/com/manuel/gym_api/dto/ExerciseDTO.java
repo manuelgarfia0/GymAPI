@@ -1,23 +1,20 @@
 package com.manuel.gym_api.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
 public class ExerciseDTO {
 
 	private Long id;
-	@NotBlank(message = "Name is required")
 	private String name;
-
-	@NotBlank(message = "Muscle group is required")
-	private String muscleGroup;
+	private Long primaryMuscleId;
+	private Long secondaryMuscleId;
 
 	public ExerciseDTO() {
 	}
 
-	public ExerciseDTO(Long id, String name, String muscleGroup) {
+	public ExerciseDTO(Long id, String name, Long primaryMuscleId, Long secondaryMuscleId) {
 		this.id = id;
 		this.name = name;
-		this.muscleGroup = muscleGroup;
+		this.primaryMuscleId = primaryMuscleId;
+		this.secondaryMuscleId = secondaryMuscleId;
 	}
 
 	public Long getId() {
@@ -28,8 +25,12 @@ public class ExerciseDTO {
 		return name;
 	}
 
-	public String getMuscleGroup() {
-		return muscleGroup;
+	public Long getPrimaryMuscleId() {
+		return primaryMuscleId;
+	}
+
+	public Long getSecondaryMuscleId() {
+		return secondaryMuscleId;
 	}
 
 	public void setId(Long id) {
@@ -40,7 +41,11 @@ public class ExerciseDTO {
 		this.name = name;
 	}
 
-	public void setMuscleGroup(String muscleGroup) {
-		this.muscleGroup = muscleGroup;
+	public void setPrimaryMuscleId(Long primaryMuscleId) {
+		this.primaryMuscleId = primaryMuscleId;
+	}
+
+	public void setSecondaryMuscleId(Long secondaryMuscleId) {
+		this.secondaryMuscleId = secondaryMuscleId;
 	}
 }
