@@ -13,6 +13,13 @@ public class Exercise {
 	@Column(nullable = false)
 	private String name;
 
+	@Column(length = 2000)
+	private String description;
+
+	@ManyToOne
+	@JoinColumn(name = "equipment_id")
+	private Equipment equipment;
+
 	@ManyToOne
 	@JoinColumn(name = "primary_muscle_id")
 	private Muscle primaryMuscle;
@@ -36,6 +43,14 @@ public class Exercise {
 		return name;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public Equipment getEquipment() {
+		return equipment;
+	}
+
 	public Muscle getPrimaryMuscle() {
 		return primaryMuscle;
 	}
@@ -54,6 +69,14 @@ public class Exercise {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setEquipment(Equipment equipment) {
+		this.equipment = equipment;
 	}
 
 	public void setPrimaryMuscle(Muscle primaryMuscle) {

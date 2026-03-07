@@ -13,11 +13,16 @@ public class Muscle {
 	@Column(nullable = false)
 	private String name;
 
+	@ManyToOne
+	@JoinColumn(name = "muscle_group_id")
+	private MuscleGroup muscleGroup;
+
 	public Muscle() {
 	}
 
-	public Muscle(String name) {
+	public Muscle(String name, MuscleGroup muscleGroup) {
 		this.name = name;
+		this.muscleGroup = muscleGroup;
 	}
 
 	public Long getId() {
@@ -28,7 +33,15 @@ public class Muscle {
 		return name;
 	}
 
+	public MuscleGroup getMuscleGroup() {
+		return muscleGroup;
+	}
+
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setMuscleGroup(MuscleGroup muscleGroup) {
+		this.muscleGroup = muscleGroup;
 	}
 }
