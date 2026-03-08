@@ -8,6 +8,7 @@ import com.manuel.gym_api.dto.ExerciseDTO;
 import com.manuel.gym_api.exception.ResourceNotFoundException;
 import com.manuel.gym_api.mapper.ExerciseMapper;
 import com.manuel.gym_api.model.Exercise;
+import com.manuel.gym_api.model.Muscle;
 import com.manuel.gym_api.repository.ExerciseRepository;
 import com.manuel.gym_api.repository.MuscleRepository;
 import com.manuel.gym_api.service.ExerciseService;
@@ -17,36 +18,52 @@ public class ExerciseServiceImpl implements ExerciseService {
 
 	private final ExerciseRepository repository;
 	private final MuscleRepository muscleRepository;
+	private final ExerciseMapper exerciseMapper;
 
-	public ExerciseServiceImpl(ExerciseRepository repository, MuscleRepository muscleRepository) {
+	public ExerciseServiceImpl(ExerciseRepository repository, MuscleRepository muscleRepository,
+			ExerciseMapper exerciseMapper) {
 		this.repository = repository;
 		this.muscleRepository = muscleRepository;
+		this.exerciseMapper = exerciseMapper;
 	}
 
 	@Override
 	public List<ExerciseDTO> getAllExercises() {
-		return repository.findAll().stream().map(ExerciseMapper::toDTO).toList();
+		return repository.findAll().stream().map(exerciseMapper::toDTO).toList();
 	}
 
 	@Override
 	public ExerciseDTO getExerciseById(Long id) {
 		Exercise exercise = repository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Ejercicio no encontrado con id: " + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Ejercicio no encontrado con ID: " + id));
 
-		return ExerciseMapper.toDTO(exercise);
+		return exerciseMapper.toDTO(exercise);
 	}
 
 	@Override
 	public ExerciseDTO saveExercise(ExerciseDTO dto) {
-		Exercise exercise = ExerciseMapper.toEntity(dto, muscleRepository);
+		Muscle primary = muscleRepository.findById(dto.getPrimaryMuscleId())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"Músculo principal no encontrado con ID: " + dto.getPrimaryMuscleId()));
+
+		Muscle secondary = null;
+		if (dto.getSecondaryMuscleId() != null) {
+			secondary = muscleRepository.findById(dto.getSecondaryMuscleId())
+					.orElseThrow(() -> new ResourceNotFoundException(
+							"Músculo secundario no encontrado con ID: " + dto.getSecondaryMuscleId()));
+		}
+
+		Exercise exercise = exerciseMapper.toEntity(dto, primary, secondary);
+
 		Exercise saved = repository.save(exercise);
-		return ExerciseMapper.toDTO(saved);
+
+		return exerciseMapper.toDTO(saved);
 	}
 
 	@Override
 	public void deleteExercise(Long id) {
 		if (!repository.existsById(id)) {
-			throw new ResourceNotFoundException("No se puede borrar, ejercicio no encontrado con id: " + id);
+			throw new ResourceNotFoundException("No se puede borrar, el ejercicio no existe con ID: " + id);
 		}
 		repository.deleteById(id);
 	}

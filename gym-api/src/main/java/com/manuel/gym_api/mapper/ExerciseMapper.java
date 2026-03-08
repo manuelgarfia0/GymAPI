@@ -1,42 +1,32 @@
 package com.manuel.gym_api.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.manuel.gym_api.dto.ExerciseDTO;
 import com.manuel.gym_api.model.Exercise;
 import com.manuel.gym_api.model.Muscle;
-import com.manuel.gym_api.repository.MuscleRepository;
 
+@Component
 public class ExerciseMapper {
 
-	public static ExerciseDTO toDTO(Exercise exercise) {
+	public ExerciseDTO toDTO(Exercise exercise) {
+		if (exercise == null)
+			return null;
 
-		Long secondaryMuscleId = null;
-
-		if (exercise.getSecondaryMuscle() != null) {
-			secondaryMuscleId = exercise.getSecondaryMuscle().getId();
-		}
+		Long secondaryMuscleId = (exercise.getSecondaryMuscle() != null) ? exercise.getSecondaryMuscle().getId() : null;
 
 		return new ExerciseDTO(exercise.getId(), exercise.getName(), exercise.getPrimaryMuscle().getId(),
 				secondaryMuscleId);
 	}
 
-	public static Exercise toEntity(ExerciseDTO dto, MuscleRepository muscleRepository) {
+	public Exercise toEntity(ExerciseDTO dto, Muscle primary, Muscle secondary) {
+		if (dto == null)
+			return null;
 
 		Exercise exercise = new Exercise();
-
 		exercise.setName(dto.getName());
-
-		Muscle primary = muscleRepository.findById(dto.getPrimaryMuscleId())
-				.orElseThrow(() -> new RuntimeException("Primary muscle not found"));
-
 		exercise.setPrimaryMuscle(primary);
-
-		if (dto.getSecondaryMuscleId() != null) {
-
-			Muscle secondary = muscleRepository.findById(dto.getSecondaryMuscleId())
-					.orElseThrow(() -> new RuntimeException("Secondary muscle not found"));
-
-			exercise.setSecondaryMuscle(secondary);
-		}
+		exercise.setSecondaryMuscle(secondary);
 
 		return exercise;
 	}

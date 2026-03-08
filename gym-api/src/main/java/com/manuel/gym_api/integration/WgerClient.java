@@ -1,16 +1,22 @@
 package com.manuel.gym_api.integration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
 public class WgerClient {
 
-	private final RestTemplate restTemplate = new RestTemplate();
+	private final RestTemplate restTemplate;
 
-	public String getExercises() {
-		String url = "https://wger.de/api/v2/exercise/?language=2";
-		return restTemplate.getForObject(url, String.class);
+	@Value("${wger.api.url}")
+	private String wgerUrl;
+
+	public WgerClient(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
 	}
 
+	public String getExercises() {
+		return restTemplate.getForObject(wgerUrl, String.class);
+	}
 }
