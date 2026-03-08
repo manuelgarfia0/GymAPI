@@ -28,8 +28,10 @@ public class Exercise {
 	@JoinColumn(name = "secondary_muscle_id")
 	private Muscle secondaryMuscle;
 
-	private boolean systemExercise;
+	@Column(name = "system_exercise", nullable = false)
+	private boolean systemExercise = false;
 
+	@Column(name = "user_id")
 	private Long userId;
 
 	public Exercise() {

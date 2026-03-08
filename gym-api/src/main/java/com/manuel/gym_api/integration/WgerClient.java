@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.manuel.gym_api.integration.dto.WgerResponseDTO;
+
 @Component
 public class WgerClient {
 
@@ -16,7 +18,7 @@ public class WgerClient {
 		this.restTemplate = restTemplate;
 	}
 
-	public String getExercises() {
-		return restTemplate.getForObject(wgerUrl, String.class);
+	public WgerResponseDTO getExercises() {
+		return restTemplate.getForObject(wgerUrl, WgerResponseDTO.class);
 	}
 }
