@@ -27,35 +27,50 @@ public class ExerciseImportServiceImpl implements ExerciseImportService {
 		WgerResponseDTO response = wgerClient.getExercises();
 
 		if (response != null && response.getResults() != null) {
-			for (WgerExerciseDTO wgerData : response.getResults()) {
+			int count = 0;
 
-				// 1. Verificamos que el ejercicio no exista ya (por el nombre) para no duplicar
-				boolean exists = exerciseRepository.findAll().stream()
-						.anyMatch(e -> e.getName().equalsIgnoreCase(wgerData.getName()));
+			for (WgerExerciseDTO wgerDto : response.getResults()) {
+				try {
+					// 1. Evitamos meter ejercicios vacíos o sin nombre
+					if (wgerDto.getName() == null || wgerDto.getName().isBlank()) {
+						continue;
+					}
 
-				if (!exists) {
-					Exercise newExercise = new Exercise();
-					newExercise.setName(wgerData.getName());
+					// 2. Comprobación LIMPIA y RÁPIDA directamente en base de datos
+					if (exerciseRepository.existsByNameIgnoreCase(wgerDto.getName().trim())) {
+						continue; // Si ya existe, nos lo saltamos
+					}
 
-					// Wger devuelve las descripciones con etiquetas HTML <p>, etc. Podrías
-					// limpiarlo si quisieras.
-					newExercise.setDescription(wgerData.getDescription());
+					// 3. Creamos la entidad
+					Exercise exercise = new Exercise();
+					exercise.setName(wgerDto.getName().trim());
 
-					newExercise.setSystemExercise(true); // Es de sistema porque viene de la API pública
+					// Limpiamos las etiquetas de HTML
+					String cleanDescription = stripHtmlTags(wgerDto.getDescription());
+					if (cleanDescription != null && cleanDescription.length() > 2000) {
+						cleanDescription = cleanDescription.substring(0, 1997) + "...";
+					}
+					exercise.setDescription(cleanDescription);
+					exercise.setSystemExercise(true);
 
-					/*
-					 * Nota: Para los músculos, Wger devuelve un array de IDs (ej: [1, 4]). Por
-					 * ahora los dejamos a null porque los IDs de Wger no coinciden con los IDs de
-					 * tu base de datos de PostgreSQL a menos que importes también los músculos.
-					 */
-					newExercise.setPrimaryMuscle(null);
-					newExercise.setSecondaryMuscle(null);
+					// 4. Guardamos
+					exerciseRepository.save(exercise);
+					count++;
 
-					// Guardamos el ejercicio en tu BBDD
-					exerciseRepository.save(newExercise);
+				} catch (Exception e) {
+					// Si falla UN ejercicio en concreto, imprimimos el error pero seguimos con el
+					// bucle
+					System.err.println("Error importing exercise '" + wgerDto.getName() + "': " + e.getMessage());
 				}
 			}
-			System.out.println("Importación completada con éxito.");
+			System.out.println("Importación finalizada. Se han guardado " + count + " ejercicios nuevos.");
 		}
+	}
+
+	private String stripHtmlTags(String html) {
+		if (html == null) {
+			return null;
+		}
+		return html.replaceAll("<[^>]*>", "").trim();
 	}
 }
