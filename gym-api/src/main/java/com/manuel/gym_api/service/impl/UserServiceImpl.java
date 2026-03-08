@@ -1,6 +1,7 @@
 package com.manuel.gym_api.service.impl;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.manuel.gym_api.dto.UserDTO;
 import com.manuel.gym_api.dto.UserRegistrationDTO;
@@ -23,12 +24,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
 		if (userRepository.existsByEmail(registrationDTO.getEmail())) {
-			throw new DuplicateResourceException("El email ya está en uso");
+			throw new DuplicateResourceException("Email is already in use");
 		}
 		if (userRepository.existsByUsername(registrationDTO.getUsername())) {
-			throw new DuplicateResourceException("El nombre de usuario ya está en uso");
+			throw new DuplicateResourceException("Username is already in use");
 		}
 
 		User user = new User();
@@ -41,9 +43,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public UserDTO getUserById(Long id) {
 		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado"));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 		return userMapper.toDTO(user);
 	}
 }
