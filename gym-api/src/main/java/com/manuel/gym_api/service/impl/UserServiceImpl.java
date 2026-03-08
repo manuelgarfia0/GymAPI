@@ -1,4 +1,4 @@
-package com.manuel.gym_api.service;
+package com.manuel.gym_api.service.impl;
 
 import org.springframework.stereotype.Service;
 
@@ -9,8 +9,8 @@ import com.manuel.gym_api.exception.ResourceNotFoundException;
 import com.manuel.gym_api.mapper.UserMapper;
 import com.manuel.gym_api.model.User;
 import com.manuel.gym_api.repository.UserRepository;
+import com.manuel.gym_api.service.UserService;
 
-// 2. Esta es la IMPLEMENTACIÓN. Aquí va la lógica real.
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
-		// Lanzamos excepciones personalizadas en vez de RuntimeException
 		if (userRepository.existsByEmail(registrationDTO.getEmail())) {
 			throw new DuplicateResourceException("El email ya está en uso");
 		}

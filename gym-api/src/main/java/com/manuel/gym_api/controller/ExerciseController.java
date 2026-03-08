@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.ExerciseDTO;
-import com.manuel.gym_api.service.ExerciseImportService;
-import com.manuel.gym_api.service.ExerciseService;
+import com.manuel.gym_api.service.impl.ExerciseImportServiceImpl;
+import com.manuel.gym_api.service.impl.ExerciseServiceImpl;
 
 import jakarta.validation.Valid;
 
@@ -21,10 +21,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/exercises")
 public class ExerciseController {
 
-	private final ExerciseService service;
-	private final ExerciseImportService importService;
+	private final ExerciseServiceImpl service;
+	private final ExerciseImportServiceImpl importService;
 
-	public ExerciseController(ExerciseService service, ExerciseImportService importService) {
+	public ExerciseController(ExerciseServiceImpl service, ExerciseImportServiceImpl importService) {
 		this.service = service;
 		this.importService = importService;
 	}

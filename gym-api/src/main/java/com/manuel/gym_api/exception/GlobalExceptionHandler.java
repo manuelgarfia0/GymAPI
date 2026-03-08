@@ -43,9 +43,10 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(errors);
 	}
 
-	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<Map<String, String>> handleRuntimeExceptions(RuntimeException ex) {
-		Map<String, String> error = Map.of("message", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Map<String, String>> handleGlobalExceptions(Exception ex) {
+		Map<String, String> error = Map.of("error", "Internal Server Error", "message",
+				"Ha ocurrido un error inesperado. Contacte con soporte.");
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 	}
 }
