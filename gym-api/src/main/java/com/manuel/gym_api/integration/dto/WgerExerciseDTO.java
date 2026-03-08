@@ -3,48 +3,50 @@ package com.manuel.gym_api.integration.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WgerExerciseDTO {
-	private String name;
-	private String description;
 
-	@JsonProperty("muscles")
-	private List<Long> muscles;
+	private List<WgerExerciseTranslation> exercises;
 
-	@JsonProperty("muscles_secondary")
-	private List<Long> muscles_secondary;
-
-	public String getName() {
-		return name;
+	public List<WgerExerciseTranslation> getExercises() {
+		return exercises;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setExercises(List<WgerExerciseTranslation> exercises) {
+		this.exercises = exercises;
 	}
 
-	public String getDescription() {
-		return description;
-	}
+	// Clase interna para leer el nombre y la descripción de la traducción en inglés
+	// (o el idioma que haya)
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class WgerExerciseTranslation {
+		private String name;
+		private String description;
+		private int language; // 2 = Inglés
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+		public String getName() {
+			return name;
+		}
 
-	public List<Long> getMuscles() {
-		return muscles;
-	}
+		public void setName(String name) {
+			this.name = name;
+		}
 
-	public void setMuscles(List<Long> muscles) {
-		this.muscles = muscles;
-	}
+		public String getDescription() {
+			return description;
+		}
 
-	public List<Long> getMuscles_secondary() {
-		return muscles_secondary;
-	}
+		public void setDescription(String description) {
+			this.description = description;
+		}
 
-	public void setMuscles_secondary(List<Long> muscles_secondary) {
-		this.muscles_secondary = muscles_secondary;
+		public int getLanguage() {
+			return language;
+		}
+
+		public void setLanguage(int language) {
+			this.language = language;
+		}
 	}
 }

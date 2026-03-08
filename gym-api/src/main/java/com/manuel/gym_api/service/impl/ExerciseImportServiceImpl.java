@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.manuel.gym_api.integration.WgerClient;
 import com.manuel.gym_api.integration.dto.WgerExerciseDTO;
+import com.manuel.gym_api.integration.dto.WgerExerciseDTO.WgerExerciseTranslation;
 import com.manuel.gym_api.integration.dto.WgerResponseDTO;
 import com.manuel.gym_api.model.Exercise;
 import com.manuel.gym_api.repository.ExerciseRepository;
@@ -29,40 +30,54 @@ public class ExerciseImportServiceImpl implements ExerciseImportService {
 		if (response != null && response.getResults() != null) {
 			int count = 0;
 
-			for (WgerExerciseDTO wgerDto : response.getResults()) {
-				try {
-					// 1. Evitamos meter ejercicios vacíos o sin nombre
-					if (wgerDto.getName() == null || wgerDto.getName().isBlank()) {
-						continue;
+			for (WgerExerciseDTO wgerBase : response.getResults()) {
+
+				// Buscamos el nombre en la lista de ejercicios anidada (preferimos language = 2
+				// que es inglés)
+				WgerExerciseTranslation englishTranslation = null;
+
+				if (wgerBase.getExercises() != null) {
+					for (WgerExerciseTranslation trans : wgerBase.getExercises()) {
+						if (trans.getLanguage() == 2 && trans.getName() != null && !trans.getName().isBlank()) {
+							englishTranslation = trans;
+							break; // Encontramos la inglesa, nos vale.
+						}
 					}
-
-					// 2. Comprobación LIMPIA y RÁPIDA directamente en base de datos
-					if (exerciseRepository.existsByNameIgnoreCase(wgerDto.getName().trim())) {
-						continue; // Si ya existe, nos lo saltamos
+					// Si no tiene inglés, pillamos la primera que haya por tener algo.
+					if (englishTranslation == null && !wgerBase.getExercises().isEmpty()) {
+						englishTranslation = wgerBase.getExercises().get(0);
 					}
-
-					// 3. Creamos la entidad
-					Exercise exercise = new Exercise();
-					exercise.setName(wgerDto.getName().trim());
-
-					// Limpiamos las etiquetas de HTML
-					String cleanDescription = stripHtmlTags(wgerDto.getDescription());
-					if (cleanDescription != null && cleanDescription.length() > 2000) {
-						cleanDescription = cleanDescription.substring(0, 1997) + "...";
-					}
-					exercise.setDescription(cleanDescription);
-					exercise.setSystemExercise(true);
-
-					// 4. Guardamos
-					exerciseRepository.save(exercise);
-					count++;
-
-				} catch (Exception e) {
-					// Si falla UN ejercicio en concreto, imprimimos el error pero seguimos con el
-					// bucle
-					System.err.println("Error importing exercise '" + wgerDto.getName() + "': " + e.getMessage());
 				}
+
+				if (englishTranslation == null || englishTranslation.getName() == null
+						|| englishTranslation.getName().isBlank()) {
+					continue; // Sigue sin nombre válido
+				}
+
+				String exerciseName = englishTranslation.getName().trim();
+
+				// Comprobamos si ya existe en BBDD
+				if (exerciseRepository.existsByNameIgnoreCase(exerciseName)) {
+					continue;
+				}
+
+				// Creamos la entidad
+				Exercise exercise = new Exercise();
+				exercise.setName(exerciseName);
+
+				// Limpiamos descripción HTML
+				String cleanDescription = stripHtmlTags(englishTranslation.getDescription());
+				if (cleanDescription != null && cleanDescription.length() > 2000) {
+					cleanDescription = cleanDescription.substring(0, 1997) + "...";
+				}
+				exercise.setDescription(cleanDescription);
+				exercise.setSystemExercise(true);
+
+				// Guardamos
+				exerciseRepository.save(exercise);
+				count++;
 			}
+
 			System.out.println("Importación finalizada. Se han guardado " + count + " ejercicios nuevos.");
 		}
 	}
