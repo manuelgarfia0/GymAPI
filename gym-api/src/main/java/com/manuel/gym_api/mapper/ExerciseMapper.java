@@ -10,24 +10,29 @@ import com.manuel.gym_api.model.Muscle;
 public class ExerciseMapper {
 
 	public ExerciseDTO toDTO(Exercise exercise) {
-		if (exercise == null)
-			return null;
+		ExerciseDTO result = null;
 
-		Long primaryMuscleId = (exercise.getPrimaryMuscle() != null) ? exercise.getPrimaryMuscle().getId() : null;
-		Long secondaryMuscleId = (exercise.getSecondaryMuscle() != null) ? exercise.getSecondaryMuscle().getId() : null;
+		if (exercise != null) {
+			Long primaryMuscleId = (exercise.getPrimaryMuscle() != null) ? exercise.getPrimaryMuscle().getId() : null;
+			Long secondaryMuscleId = (exercise.getSecondaryMuscle() != null) ? exercise.getSecondaryMuscle().getId()
+					: null;
 
-		return new ExerciseDTO(exercise.getId(), exercise.getName(), primaryMuscleId, secondaryMuscleId);
+			result = new ExerciseDTO(exercise.getId(), exercise.getName(), primaryMuscleId, secondaryMuscleId);
+		}
+
+		return result;
 	}
 
 	public Exercise toEntity(ExerciseDTO dto, Muscle primary, Muscle secondary) {
-		if (dto == null)
-			return null;
+		Exercise result = null;
 
-		Exercise exercise = new Exercise();
-		exercise.setName(dto.getName());
-		exercise.setPrimaryMuscle(primary);
-		exercise.setSecondaryMuscle(secondary);
+		if (dto != null) {
+			result = new Exercise();
+			result.setName(dto.getName());
+			result.setPrimaryMuscle(primary);
+			result.setSecondaryMuscle(secondary);
+		}
 
-		return exercise;
+		return result;
 	}
 }

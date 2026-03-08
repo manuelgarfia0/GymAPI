@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.ExerciseDTO;
-import com.manuel.gym_api.service.impl.ExerciseImportServiceImpl;
-import com.manuel.gym_api.service.impl.ExerciseServiceImpl;
+import com.manuel.gym_api.service.ExerciseImportService;
+import com.manuel.gym_api.service.ExerciseService;
 
 import jakarta.validation.Valid;
 
@@ -21,38 +21,38 @@ import jakarta.validation.Valid;
 @RequestMapping("/exercises")
 public class ExerciseController {
 
-	private final ExerciseServiceImpl service;
-	private final ExerciseImportServiceImpl importService;
+	private final ExerciseService exerciseService;
+	private final ExerciseImportService importService;
 
-	public ExerciseController(ExerciseServiceImpl service, ExerciseImportServiceImpl importService) {
-		this.service = service;
+	public ExerciseController(ExerciseService exerciseService, ExerciseImportService importService) {
+		this.exerciseService = exerciseService;
 		this.importService = importService;
 	}
 
 	@GetMapping
 	public ResponseEntity<List<ExerciseDTO>> getExercises() {
-		return ResponseEntity.ok(service.getAllExercises());
+		return ResponseEntity.ok(exerciseService.getAllExercises());
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ExerciseDTO> getExercise(@PathVariable Long id) {
-		return ResponseEntity.ok(service.getExerciseById(id));
+		return ResponseEntity.ok(exerciseService.getExerciseById(id));
 	}
 
 	@PostMapping
 	public ResponseEntity<ExerciseDTO> createExercise(@RequestBody @Valid ExerciseDTO dto) {
-		ExerciseDTO created = service.saveExercise(dto);
-		return ResponseEntity.ok(created);
+		return ResponseEntity.ok(exerciseService.saveExercise(dto));
 	}
 
 	@PostMapping("/import")
-	public void importExercises() {
+	public ResponseEntity<Void> importExercises() {
 		importService.importExercises();
+		return ResponseEntity.ok().build();
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteExercise(@PathVariable Long id) {
-		service.deleteExercise(id);
+		exerciseService.deleteExercise(id);
 		return ResponseEntity.noContent().build();
 	}
 }
