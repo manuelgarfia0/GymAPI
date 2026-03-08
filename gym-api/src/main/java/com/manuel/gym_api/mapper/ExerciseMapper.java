@@ -13,10 +13,10 @@ public class ExerciseMapper {
 		if (exercise == null)
 			return null;
 
+		Long primaryMuscleId = (exercise.getPrimaryMuscle() != null) ? exercise.getPrimaryMuscle().getId() : null;
 		Long secondaryMuscleId = (exercise.getSecondaryMuscle() != null) ? exercise.getSecondaryMuscle().getId() : null;
 
-		return new ExerciseDTO(exercise.getId(), exercise.getName(), exercise.getPrimaryMuscle().getId(),
-				secondaryMuscleId);
+		return new ExerciseDTO(exercise.getId(), exercise.getName(), primaryMuscleId, secondaryMuscleId);
 	}
 
 	public Exercise toEntity(ExerciseDTO dto, Muscle primary, Muscle secondary) {

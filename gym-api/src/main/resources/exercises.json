@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Barbell Bench Press",
+    "description": "Lie on a flat bench. Grasp the barbell with a medium-width grip. Lift the bar and hold it straight over you. Breathe in and lower the bar slowly until it touches your middle chest. Breathe out and push the bar back to the starting position."
+  },
+  {
+    "name": "Squat",
+    "description": "Stand with your feet shoulder-width apart. Rest a barbell on your upper back. Bend your knees and lower your hips as if sitting in a chair. Keep your back straight. Push back up to the starting position."
+  },
+  {
+    "name": "Deadlift",
+    "description": "Stand with your mid-foot under the barbell. Bend over and grab the bar with a shoulder-width grip. Bend your knees until your shins touch the bar. Lift your chest up and straighten your lower back. Take a big breath, hold it, and stand up with the weight."
+  },
+  {
+    "name": "Pull-up",
+    "description": "Grab the pull-up bar with your palms facing forward. Hang with your arms fully extended. Pull yourself up until your chin is over the bar. Lower yourself back down with control."
+  },
+  {
+    "name": "Overhead Press",
+    "description": "Stand holding a barbell at shoulder height. Press the bar straight up overhead until your arms are fully extended. Lower the bar back down to your shoulders."
+  },
+  {
+    "name": "Barbell Row",
+    "description": "Bend over holding a barbell. Keep your back straight and parallel to the floor. Pull the bar to your lower chest. Lower it back down with control."
+  },
+  {
+    "name": "Dumbbell Curl",
+    "description": "Stand holding a dumbbell in each hand. Keep your elbows close to your torso. Curl the weights up to shoulder level. Lower them back down slowly."
+  },
+  {
+    "name": "Tricep Extension",
+    "description": "Hold a dumbbell with both hands overhead. Lower the weight behind your head by bending your elbows. Push the weight back up to the starting position."
+  },
+  {
+    "name": "Leg Press",
+    "description": "Sit on the leg press machine. Place your feet on the platform shoulder-width apart. Lower the platform until your knees are bent at a 90-degree angle. Push the platform back up."
+  },
+  {
+    "name": "Plank",
+    "description": "Start in a push-up position. Rest on your forearms instead of your hands. Keep your body in a straight line from head to heels. Hold this position."
+  }
+]
