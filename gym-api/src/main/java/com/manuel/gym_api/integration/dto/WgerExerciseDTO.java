@@ -1,19 +1,20 @@
 package com.manuel.gym_api.integration.dto;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-// Esto mapea cada ejercicio dentro del array "results" de Wger
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WgerExerciseDTO {
 	private String name;
 	private String description;
 
-	// En Wger, los músculos principales no vienen como objetos, vienen como un
-	// array de IDs [1, 2]
 	@JsonProperty("muscles")
-	private Integer[] primaryMuscles;
+	private List<Long> muscles;
 
 	@JsonProperty("muscles_secondary")
-	private Integer[] secondaryMuscles;
+	private List<Long> muscles_secondary;
 
 	public String getName() {
 		return name;
@@ -31,19 +32,19 @@ public class WgerExerciseDTO {
 		this.description = description;
 	}
 
-	public Integer[] getPrimaryMuscles() {
-		return primaryMuscles;
+	public List<Long> getMuscles() {
+		return muscles;
 	}
 
-	public void setPrimaryMuscles(Integer[] primaryMuscles) {
-		this.primaryMuscles = primaryMuscles;
+	public void setMuscles(List<Long> muscles) {
+		this.muscles = muscles;
 	}
 
-	public Integer[] getSecondaryMuscles() {
-		return secondaryMuscles;
+	public List<Long> getMuscles_secondary() {
+		return muscles_secondary;
 	}
 
-	public void setSecondaryMuscles(Integer[] secondaryMuscles) {
-		this.secondaryMuscles = secondaryMuscles;
+	public void setMuscles_secondary(List<Long> muscles_secondary) {
+		this.muscles_secondary = muscles_secondary;
 	}
 }
