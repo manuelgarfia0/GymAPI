@@ -1,0 +1,57 @@
+package com.manuel.gym_api.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.manuel.gym_api.dto.RoutineDTO;
+import com.manuel.gym_api.service.RoutineService;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/routines")
+public class RoutineController {
+
+	private final RoutineService routineService;
+
+	public RoutineController(RoutineService routineService) {
+		this.routineService = routineService;
+	}
+
+	@PostMapping
+	public ResponseEntity<RoutineDTO> createRoutine(@RequestBody @Valid RoutineDTO routineDTO) {
+		RoutineDTO createdRoutine = routineService.createRoutine(routineDTO);
+		return new ResponseEntity<>(createdRoutine, HttpStatus.CREATED);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<RoutineDTO> getRoutineById(@PathVariable Long id) {
+		return ResponseEntity.ok(routineService.getRoutineById(id));
+	}
+
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<RoutineDTO>> getRoutinesByUserId(@PathVariable Long userId) {
+		return ResponseEntity.ok(routineService.getRoutinesByUserId(userId));
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<RoutineDTO> updateRoutine(@PathVariable Long id, @RequestBody @Valid RoutineDTO routineDTO) {
+		return ResponseEntity.ok(routineService.updateRoutine(id, routineDTO));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteRoutine(@PathVariable Long id) {
+		routineService.deleteRoutine(id);
+		return ResponseEntity.noContent().build();
+	}
+}
