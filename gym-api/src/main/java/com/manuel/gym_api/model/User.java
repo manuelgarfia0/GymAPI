@@ -1,7 +1,14 @@
 package com.manuel.gym_api.model;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users")
@@ -28,6 +35,9 @@ public class User {
 
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	@Column(nullable = false)
+	private boolean publicProfile = true;
 
 	@PrePersist
 	protected void onCreate() {
@@ -84,6 +94,14 @@ public class User {
 
 	public void setLanguagePreference(String languagePreference) {
 		this.languagePreference = languagePreference;
+	}
+
+	public boolean isPublicProfile() {
+		return publicProfile;
+	}
+
+	public void setPublicProfile(boolean publicProfile) {
+		this.publicProfile = publicProfile;
 	}
 
 	public LocalDateTime getCreatedAt() {
