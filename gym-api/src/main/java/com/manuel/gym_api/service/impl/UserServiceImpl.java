@@ -1,5 +1,6 @@
 package com.manuel.gym_api.service.impl;
 
+import org.springframework.security.crypto.password.PasswordEncoder; // NUEVO
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,12 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final UserMapper userMapper;
+	private final PasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.userMapper = userMapper;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
@@ -36,7 +39,8 @@ public class UserServiceImpl implements UserService {
 		User user = new User();
 		user.setUsername(registrationDTO.getUsername());
 		user.setEmail(registrationDTO.getEmail());
-		user.setPassword(registrationDTO.getPassword());
+
+		user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
 
 		User savedUser = userRepository.save(user);
 		return userMapper.toDTO(savedUser);
