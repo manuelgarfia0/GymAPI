@@ -3,6 +3,7 @@ package com.manuel.gym_api.dto;
 public class RoutineExerciseDTO {
 	private Long id;
 	private Long exerciseId;
+	private String exerciseName; // NUEVO CAMPO para enviar al frontend
 	private Integer orderIndex;
 	private Integer sets;
 	private Integer reps;
@@ -12,10 +13,11 @@ public class RoutineExerciseDTO {
 	public RoutineExerciseDTO() {
 	}
 
-	public RoutineExerciseDTO(Long id, Long exerciseId, Integer orderIndex, Integer sets, Integer reps,
-			Integer restSeconds, String notes) {
+	public RoutineExerciseDTO(Long id, Long exerciseId, String exerciseName, Integer orderIndex, Integer sets,
+			Integer reps, Integer restSeconds, String notes) {
 		this.id = id;
 		this.exerciseId = exerciseId;
+		this.exerciseName = exerciseName;
 		this.orderIndex = orderIndex;
 		this.sets = sets;
 		this.reps = reps;
@@ -37,6 +39,14 @@ public class RoutineExerciseDTO {
 
 	public void setExerciseId(Long exerciseId) {
 		this.exerciseId = exerciseId;
+	}
+
+	public String getExerciseName() {
+		return exerciseName;
+	}
+
+	public void setExerciseName(String exerciseName) {
+		this.exerciseName = exerciseName;
 	}
 
 	public Integer getOrderIndex() {

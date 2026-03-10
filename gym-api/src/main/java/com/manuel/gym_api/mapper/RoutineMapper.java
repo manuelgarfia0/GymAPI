@@ -32,8 +32,12 @@ public class RoutineMapper {
 		if (entity == null)
 			return null;
 
-		return new RoutineExerciseDTO(entity.getId(), entity.getExercise().getId(), entity.getOrderIndex(),
-				entity.getSets(), entity.getReps(), entity.getRestSeconds(), entity.getNotes());
+		// Extraemos el nombre del ejercicio (si existe)
+		String exerciseName = (entity.getExercise() != null) ? entity.getExercise().getName() : null;
+
+		return new RoutineExerciseDTO(entity.getId(), entity.getExercise().getId(), exerciseName, // NUEVO CAMPO PASADO
+																									// AL CONSTRUCTOR
+				entity.getOrderIndex(), entity.getSets(), entity.getReps(), entity.getRestSeconds(), entity.getNotes());
 	}
 
 	public Routine toEntity(RoutineDTO dto, User user) {

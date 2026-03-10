@@ -70,8 +70,12 @@ public class RoutineServiceImpl implements RoutineService {
 		routine.setName(dto.getName());
 		routine.setDescription(dto.getDescription());
 
-		// Limpiar colección gestionada por Hibernate e insertar nuevos
+		// Limpiar colección e insertar nuevos
 		routine.getRoutineExercises().clear();
+
+		// IMPORTANTE: Hacemos un flush de la base de datos para borrar huellas viejas
+		routineRepository.saveAndFlush(routine);
+
 		assignExercisesToRoutine(routine, dto.getExercises());
 
 		Routine updatedRoutine = routineRepository.save(routine);
@@ -94,6 +98,7 @@ public class RoutineServiceImpl implements RoutineService {
 
 		exerciseDTOs.forEach(exDTO -> {
 			Exercise exercise = getExerciseOrThrow(exDTO.getExerciseId());
+			// Como aquí recuperamos el 'exercise' de la BD, su nombre DEBE estar presente
 			routine.getRoutineExercises().add(routineMapper.toRoutineExerciseEntity(exDTO, routine, exercise));
 		});
 	}
