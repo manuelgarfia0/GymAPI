@@ -1,6 +1,8 @@
 package com.manuel.gym_api.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,6 @@ public class ExerciseServiceImpl implements ExerciseService {
 	private final MuscleRepository muscleRepository;
 	private final ExerciseMapper exerciseMapper;
 
-	// Inyección de dependencias por constructor
 	public ExerciseServiceImpl(ExerciseRepository repository, MuscleRepository muscleRepository,
 			ExerciseMapper exerciseMapper) {
 		this.repository = repository;
@@ -47,25 +48,20 @@ public class ExerciseServiceImpl implements ExerciseService {
 	@Override
 	@Transactional
 	public ExerciseDTO saveExercise(ExerciseDTO dto) {
-		// Buscamos el músculo principal
 		Muscle primary = muscleRepository.findById(dto.getPrimaryMuscleId()).orElseThrow(
 				() -> new ResourceNotFoundException("Primary muscle not found with ID: " + dto.getPrimaryMuscleId()));
 
-		// Buscamos el músculo secundario (si existe)
-		Muscle secondary = null;
-		if (dto.getSecondaryMuscleId() != null) {
-			secondary = muscleRepository.findById(dto.getSecondaryMuscleId())
-					.orElseThrow(() -> new ResourceNotFoundException(
-							"Secondary muscle not found with ID: " + dto.getSecondaryMuscleId()));
+		Set<Muscle> secondarySet = new HashSet<>();
+		if (dto.getSecondaryMuscleIds() != null && !dto.getSecondaryMuscleIds().isEmpty()) {
+			for (Long secId : dto.getSecondaryMuscleIds()) {
+				muscleRepository.findById(secId).ifPresent(secondarySet::add);
+			}
 		}
 
-		// Transformamos a Entidad usando el Mapper
-		Exercise exercise = exerciseMapper.toEntity(dto, primary, secondary);
+		Exercise exercise = exerciseMapper.toEntity(dto, primary, secondarySet, null);
 
-		// Guardamos en base de datos
 		Exercise saved = repository.save(exercise);
 
-		// Devolvemos el DTO
 		return exerciseMapper.toDTO(saved);
 	}
 

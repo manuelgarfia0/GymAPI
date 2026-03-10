@@ -10,6 +10,8 @@ public class WorkoutSetDTO {
 	@NotNull(message = "Exercise ID is required")
 	private Long exerciseId;
 
+	private String exerciseName;
+
 	@NotNull(message = "Order of the exercises is required")
 	private Integer exerciseOrder;
 
@@ -44,6 +46,15 @@ public class WorkoutSetDTO {
 
 	public void setExerciseId(Long exerciseId) {
 		this.exerciseId = exerciseId;
+	}
+
+	// GETTER Y SETTER PARA EL NOMBRE DEL EJERCICIO
+	public String getExerciseName() {
+		return exerciseName;
+	}
+
+	public void setExerciseName(String exerciseName) {
+		this.exerciseName = exerciseName;
 	}
 
 	public Integer getExerciseOrder() {

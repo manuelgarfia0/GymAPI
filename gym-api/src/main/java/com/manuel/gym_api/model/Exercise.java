@@ -1,6 +1,19 @@
 package com.manuel.gym_api.model;
 
-import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "exercises")
@@ -24,9 +37,9 @@ public class Exercise {
 	@JoinColumn(name = "primary_muscle_id")
 	private Muscle primaryMuscle;
 
-	@ManyToOne
-	@JoinColumn(name = "secondary_muscle_id")
-	private Muscle secondaryMuscle;
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "exercise_secondary_muscles", joinColumns = @JoinColumn(name = "exercise_id"), inverseJoinColumns = @JoinColumn(name = "muscle_id"))
+	private Set<Muscle> secondaryMuscles = new HashSet<>();
 
 	@Column(name = "system_exercise", nullable = false)
 	private boolean systemExercise = false;
@@ -41,56 +54,60 @@ public class Exercise {
 		return id;
 	}
 
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public Equipment getEquipment() {
-		return equipment;
-	}
-
-	public Muscle getPrimaryMuscle() {
-		return primaryMuscle;
-	}
-
-	public Muscle getSecondaryMuscle() {
-		return secondaryMuscle;
-	}
-
-	public boolean isSystemExercise() {
-		return systemExercise;
-	}
-
-	public Long getUserId() {
-		return userId;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Equipment getEquipment() {
+		return equipment;
 	}
 
 	public void setEquipment(Equipment equipment) {
 		this.equipment = equipment;
 	}
 
+	public Muscle getPrimaryMuscle() {
+		return primaryMuscle;
+	}
+
 	public void setPrimaryMuscle(Muscle primaryMuscle) {
 		this.primaryMuscle = primaryMuscle;
 	}
 
-	public void setSecondaryMuscle(Muscle secondaryMuscle) {
-		this.secondaryMuscle = secondaryMuscle;
+	public Set<Muscle> getSecondaryMuscles() {
+		return secondaryMuscles;
+	}
+
+	public void setSecondaryMuscles(Set<Muscle> secondaryMuscles) {
+		this.secondaryMuscles = secondaryMuscles;
+	}
+
+	public boolean isSystemExercise() {
+		return systemExercise;
 	}
 
 	public void setSystemExercise(boolean systemExercise) {
 		this.systemExercise = systemExercise;
+	}
+
+	public Long getUserId() {
+		return userId;
 	}
 
 	public void setUserId(Long userId) {

@@ -12,28 +12,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.manuel.gym_api.model.Exercise;
+import com.manuel.gym_api.repository.EquipmentRepository;
 import com.manuel.gym_api.repository.ExerciseRepository;
+import com.manuel.gym_api.repository.MuscleRepository;
 import com.manuel.gym_api.service.ExerciseImportService;
 
 @Service
 public class ExerciseImportServiceImpl implements ExerciseImportService {
 
 	private final ExerciseRepository exerciseRepository;
+	private final MuscleRepository muscleRepository;
+	private final EquipmentRepository equipmentRepository;
 
-	// Solo inyectamos el repositorio, ¡nada de Jackson!
-	public ExerciseImportServiceImpl(ExerciseRepository exerciseRepository) {
+	public ExerciseImportServiceImpl(ExerciseRepository exerciseRepository, MuscleRepository muscleRepository,
+			EquipmentRepository equipmentRepository) {
 		this.exerciseRepository = exerciseRepository;
+		this.muscleRepository = muscleRepository;
+		this.equipmentRepository = equipmentRepository;
 	}
 
 	@Override
 	@Transactional
 	public void importExercises() {
 		try {
-			// 1. Leemos el archivo JSON local
 			ClassPathResource resource = new ClassPathResource("exercises.json");
 			InputStream inputStream = resource.getInputStream();
 
-			// 2. Usamos un lector de texto nativo de Java
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 			StringBuilder jsonBuilder = new StringBuilder();
 			String line;
@@ -42,15 +46,10 @@ public class ExerciseImportServiceImpl implements ExerciseImportService {
 			}
 			String jsonContent = jsonBuilder.toString();
 
-			// 3. Parseamos el JSON manualmente de forma súper sencilla (sin librerías
-			// extra)
 			List<Exercise> exercisesToSave = parseJsonManually(jsonContent);
 
 			int count = 0;
-
-			// 4. Guardamos en base de datos
 			for (Exercise ex : exercisesToSave) {
-				// Comprobamos si el nombre existe
 				if (!exerciseRepository.existsByNameIgnoreCase(ex.getName())) {
 					exerciseRepository.save(ex);
 					count++;
@@ -65,39 +64,87 @@ public class ExerciseImportServiceImpl implements ExerciseImportService {
 		}
 	}
 
-	/**
-	 * Un mini-parseador casero para no depender de librerías como Jackson. Lee el
-	 * JSON buscando las palabras "name" y "description".
-	 */
 	private List<Exercise> parseJsonManually(String json) {
 		List<Exercise> exercises = new ArrayList<>();
-
-		// Partimos el JSON por las llaves de apertura '{'
 		String[] blocks = json.split("\\{");
 
 		for (String block : blocks) {
 			if (block.contains("\"name\"") && block.contains("\"description\"")) {
 				try {
-					// Extraemos el nombre
-					String namePart = block.split("\"name\"\\s*:\\s*\"")[1];
-					String name = namePart.substring(0, namePart.indexOf("\""));
+					String name = extractStringValue(block, "\"name\"");
+					String description = extractStringValue(block, "\"description\"");
 
-					// Extraemos la descripción
-					String descPart = block.split("\"description\"\\s*:\\s*\"")[1];
-					String description = descPart.substring(0, descPart.indexOf("\""));
+					Long primaryId = extractLongValue(block, "\"primary_muscle_id\"");
+					Long equipmentId = extractLongValue(block, "\"equipment_id\"");
+					List<Long> secondaryIds = extractLongArray(block, "\"secondary_muscle_ids\"");
 
 					Exercise ex = new Exercise();
-					ex.setName(name.trim());
-					ex.setDescription(description.trim());
+					ex.setName(name);
+					ex.setDescription(description);
 					ex.setSystemExercise(true);
+
+					if (primaryId != null) {
+						muscleRepository.findById(primaryId).ifPresent(ex::setPrimaryMuscle);
+					}
+
+					if (equipmentId != null) {
+						equipmentRepository.findById(equipmentId).ifPresent(ex::setEquipment);
+					}
+
+					for (Long secId : secondaryIds) {
+						muscleRepository.findById(secId).ifPresent(m -> ex.getSecondaryMuscles().add(m));
+					}
 
 					exercises.add(ex);
 				} catch (Exception e) {
-					// Si algún bloque se lee mal, lo ignoramos y seguimos
+					// Ignorar bloque roto
 				}
 			}
 		}
-
 		return exercises;
+	}
+
+	private String extractStringValue(String block, String key) {
+		try {
+			String part = block.split(key + "\\s*:\\s*\"")[1];
+			return part.substring(0, part.indexOf("\"")).trim();
+		} catch (Exception e) {
+			return "";
+		}
+	}
+
+	private Long extractLongValue(String block, String key) {
+		try {
+			String part = block.split(key + "\\s*:\\s*")[1];
+			// Quitamos las comas, los saltos de línea y los espacios de alrededor del
+			// número
+			String numberStr = part.split("[,}\\n]")[0].trim();
+			if (numberStr.equals("null"))
+				return null;
+			return Long.parseLong(numberStr);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private List<Long> extractLongArray(String block, String key) {
+		List<Long> result = new ArrayList<>();
+		try {
+			if (!block.contains(key))
+				return result;
+
+			String part = block.split(key + "\\s*:\\s*\\[")[1];
+			String arrayStr = part.split("\\]")[0].trim();
+			if (arrayStr.isEmpty())
+				return result;
+
+			String[] numbers = arrayStr.split(",");
+			for (String num : numbers) {
+				result.add(Long.parseLong(num.trim()));
+			}
+		} catch (Exception e) {
+			// Ignorar
+		}
+		return result;
 	}
 }

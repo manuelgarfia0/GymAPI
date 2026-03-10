@@ -48,6 +48,11 @@ public class WorkoutMapper {
 		WorkoutSetDTO dto = new WorkoutSetDTO();
 		dto.setId(set.getId());
 		dto.setExerciseId(set.getExercise().getId());
+
+		if (set.getExercise() != null && set.getExercise().getName() != null) {
+			dto.setExerciseName(set.getExercise().getName());
+		}
+
 		dto.setExerciseOrder(set.getExerciseOrder());
 		dto.setSetNumber(set.getSetNumber());
 		dto.setWeight(set.getWeight());
