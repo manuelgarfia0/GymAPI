@@ -35,8 +35,7 @@ public class RoutineMapper {
 		// Extraemos el nombre del ejercicio (si existe)
 		String exerciseName = (entity.getExercise() != null) ? entity.getExercise().getName() : null;
 
-		return new RoutineExerciseDTO(entity.getId(), entity.getExercise().getId(), exerciseName, // NUEVO CAMPO PASADO
-																									// AL CONSTRUCTOR
+		return new RoutineExerciseDTO(entity.getId(), entity.getExercise().getId(), exerciseName,
 				entity.getOrderIndex(), entity.getSets(), entity.getReps(), entity.getRestSeconds(), entity.getNotes());
 	}
 

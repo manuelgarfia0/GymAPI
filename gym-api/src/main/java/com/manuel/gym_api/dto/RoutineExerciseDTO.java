@@ -3,7 +3,7 @@ package com.manuel.gym_api.dto;
 public class RoutineExerciseDTO {
 	private Long id;
 	private Long exerciseId;
-	private String exerciseName; // NUEVO CAMPO para enviar al frontend
+	private String exerciseName;
 	private Integer orderIndex;
 	private Integer sets;
 	private Integer reps;
