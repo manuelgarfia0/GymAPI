@@ -9,6 +9,7 @@ public class UserDTO {
 	private boolean isPremium;
 	private String languagePreference;
 	private LocalDateTime createdAt;
+	private boolean publicProfile;
 
 	// Getters y Setters
 	public Long getId() {
@@ -40,7 +41,7 @@ public class UserDTO {
 	}
 
 	public void setPremium(boolean premium) {
-		isPremium = premium;
+		this.isPremium = premium;
 	}
 
 	public String getLanguagePreference() {
@@ -57,5 +58,14 @@ public class UserDTO {
 
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	// Nuevos métodos para publicProfile
+	public boolean isPublicProfile() {
+		return publicProfile;
+	}
+
+	public void setPublicProfile(boolean publicProfile) {
+		this.publicProfile = publicProfile;
 	}
 }

@@ -27,17 +27,28 @@ public class SecurityConfigurations {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.csrf(csrf -> csrf.disable())
-				.cors(cors -> cors.configurationSource(corsConfigurationSource())) // AGREGAR CORS
+				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
-						// Permitir endpoints de autenticación
+						// Permitir endpoints de autenticación sin JWT
 						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
-						// Permitir health checks
+
+						// Permitir endpoints de información (GET)
+						.requestMatchers(HttpMethod.GET, "/api/auth/login").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/auth/register").permitAll()
+
+						// Permitir endpoints de test y health checks
+						.requestMatchers("/api/test", "/api/health-check").permitAll()
 						.requestMatchers("/actuator/**", "/health").permitAll()
-						// TEMPORAL: Permitir todos los endpoints para testing
-						.requestMatchers("/api/**").permitAll()
+
+						// Permitir exercises temporalmente
+						.requestMatchers("/api/exercises").permitAll()
+
+						// REQUERIR JWT para /api/auth/me y otros endpoints protegidos
+						.requestMatchers("/api/auth/me").authenticated()
+
 						// Requerir autenticación para todo lo demás
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();

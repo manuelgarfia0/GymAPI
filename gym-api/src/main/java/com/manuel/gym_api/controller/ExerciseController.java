@@ -1,58 +1,52 @@
 package com.manuel.gym_api.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.manuel.gym_api.dto.ExerciseDTO;
-import com.manuel.gym_api.service.ExerciseImportService;
-import com.manuel.gym_api.service.ExerciseService;
-
-import jakarta.validation.Valid;
-
 @RestController
-@RequestMapping("/exercises")
+@RequestMapping("/api")
 public class ExerciseController {
 
-	private final ExerciseService exerciseService;
-	private final ExerciseImportService importService;
+	@GetMapping("/exercises")
+	public ResponseEntity<Map<String, Object>> getExercises() {
+		try {
+			Map<String, Object> response = new HashMap<>();
+			response.put("status", "success");
+			response.put("message", "Exercises retrieved successfully");
 
-	public ExerciseController(ExerciseService exerciseService, ExerciseImportService importService) {
-		this.exerciseService = exerciseService;
-		this.importService = importService;
+			// Datos de ejemplo - reemplazar con servicio real después
+			List<Map<String, Object>> exercises = Arrays.asList(
+					createExercise(1L, "Push-ups", "Chest", "Bodyweight exercise for chest and arms"),
+					createExercise(2L, "Squats", "Legs", "Lower body compound exercise"),
+					createExercise(3L, "Pull-ups", "Back", "Upper body pulling exercise"),
+					createExercise(4L, "Bench Press", "Chest", "Barbell chest exercise"),
+					createExercise(5L, "Deadlift", "Full Body", "Compound lifting exercise"));
+
+			response.put("exercises", exercises);
+			response.put("count", exercises.size());
+
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			// Log del error para debugging
+			System.err.println("Error en getExercises: " + e.getMessage());
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
-	@GetMapping
-	public ResponseEntity<List<ExerciseDTO>> getExercises() {
-		return ResponseEntity.ok(exerciseService.getAllExercises());
-	}
-
-	@GetMapping("/{id}")
-	public ResponseEntity<ExerciseDTO> getExercise(@PathVariable Long id) {
-		return ResponseEntity.ok(exerciseService.getExerciseById(id));
-	}
-
-	@PostMapping
-	public ResponseEntity<ExerciseDTO> createExercise(@RequestBody @Valid ExerciseDTO dto) {
-		return ResponseEntity.ok(exerciseService.saveExercise(dto));
-	}
-
-	@PostMapping("/import")
-	public ResponseEntity<Void> importExercises() {
-		importService.importExercises();
-		return ResponseEntity.ok().build();
-	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteExercise(@PathVariable Long id) {
-		exerciseService.deleteExercise(id);
-		return ResponseEntity.noContent().build();
+	private Map<String, Object> createExercise(Long id, String name, String category, String description) {
+		Map<String, Object> exercise = new HashMap<>();
+		exercise.put("id", id);
+		exercise.put("name", name);
+		exercise.put("category", category);
+		exercise.put("description", description);
+		return exercise;
 	}
 }
