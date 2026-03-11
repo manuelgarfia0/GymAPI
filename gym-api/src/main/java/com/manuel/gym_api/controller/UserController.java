@@ -1,11 +1,18 @@
 package com.manuel.gym_api.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.manuel.gym_api.dto.UserDTO;
 import com.manuel.gym_api.dto.UserRegistrationDTO;
 import com.manuel.gym_api.service.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -27,5 +34,11 @@ public class UserController {
 	public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
 		UserDTO user = userService.getUserById(id);
 		return ResponseEntity.ok(user);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updateDTO) {
+		UserDTO updated = userService.updateUser(id, updateDTO);
+		return ResponseEntity.ok(updated);
 	}
 }

@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.LoginDTO;
 import com.manuel.gym_api.dto.TokenDTO;
-import com.manuel.gym_api.dto.UserDTO;
 import com.manuel.gym_api.dto.UserRegistrationDTO;
 import com.manuel.gym_api.model.User;
+import com.manuel.gym_api.security.AuthService;
 import com.manuel.gym_api.security.TokenService;
 import com.manuel.gym_api.service.UserService;
 
@@ -30,12 +30,14 @@ public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final UserService userService;
+	private final AuthService authService; // ← AÑADIR ESTE
 
 	public AuthController(AuthenticationManager authenticationManager, TokenService tokenService,
-			UserService userService) {
+			UserService userService, AuthService authService) { // ← AÑADIR AL CONSTRUCTOR
 		this.authenticationManager = authenticationManager;
 		this.tokenService = tokenService;
 		this.userService = userService;
+		this.authService = authService; // ← AÑADIR ESTO
 	}
 
 	@PostMapping("/login")
@@ -62,18 +64,16 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<Map<String, String>> register(@RequestBody @Valid UserRegistrationDTO registrationDTO) {
+	public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserRegistrationDTO registrationDTO) {
 		try {
-			UserDTO userDTO = userService.registerUser(registrationDTO);
+			userService.registerUser(registrationDTO);
 
-			Map<String, String> response = new HashMap<>();
-			response.put("status", "success");
-			response.put("message", "User registered successfully");
-			response.put("userId", userDTO.getId().toString());
+			// Cargamos el User real para poder generar el token
+			User user = (User) authService.loadUserByUsername(registrationDTO.getUsername());
+			var token = tokenService.generateToken(user);
 
-			return ResponseEntity.ok(response);
+			return ResponseEntity.ok(new TokenDTO(token));
 		} catch (Exception e) {
-			// Log del error para debugging
 			System.err.println("Error en register: " + e.getMessage());
 			e.printStackTrace();
 			throw e;

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.RoutineDTO;
@@ -19,7 +20,7 @@ import com.manuel.gym_api.service.RoutineService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/routines")
+@RequestMapping("/api/routines")
 public class RoutineController {
 
 	private final RoutineService routineService;
@@ -53,5 +54,11 @@ public class RoutineController {
 	public ResponseEntity<Void> deleteRoutine(@PathVariable Long id) {
 		routineService.deleteRoutine(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	// Para que Flutter pueda buscar por userId con query param
+	@GetMapping
+	public ResponseEntity<List<RoutineDTO>> getRoutinesByUserIdParam(@RequestParam Long userId) {
+		return ResponseEntity.ok(routineService.getRoutinesByUserId(userId));
 	}
 }

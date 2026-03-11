@@ -4,41 +4,49 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
 public class ExerciseController {
 
+	// Lista fija de ejercicios (reemplazar con servicio real cuando esté listo)
+	private final List<Map<String, Object>> exercises = Arrays.asList(
+			createExercise(1L, "Push-ups", "Chest", "Bodyweight exercise for chest and arms"),
+			createExercise(2L, "Squats", "Legs", "Lower body compound exercise"),
+			createExercise(3L, "Pull-ups", "Back", "Upper body pulling exercise"),
+			createExercise(4L, "Bench Press", "Chest", "Barbell chest exercise"),
+			createExercise(5L, "Deadlift", "Full Body", "Compound lifting exercise"));
+
+	// GET /api/exercises — devuelve la lista directamente (sin wrapper)
 	@GetMapping("/exercises")
-	public ResponseEntity<Map<String, Object>> getExercises() {
-		try {
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", "success");
-			response.put("message", "Exercises retrieved successfully");
+	public ResponseEntity<List<Map<String, Object>>> getExercises() {
+		return ResponseEntity.ok(exercises);
+	}
 
-			// Datos de ejemplo - reemplazar con servicio real después
-			List<Map<String, Object>> exercises = Arrays.asList(
-					createExercise(1L, "Push-ups", "Chest", "Bodyweight exercise for chest and arms"),
-					createExercise(2L, "Squats", "Legs", "Lower body compound exercise"),
-					createExercise(3L, "Pull-ups", "Back", "Upper body pulling exercise"),
-					createExercise(4L, "Bench Press", "Chest", "Barbell chest exercise"),
-					createExercise(5L, "Deadlift", "Full Body", "Compound lifting exercise"));
+	// GET /api/exercises/{id}
+	@GetMapping("/exercises/{id}")
+	public ResponseEntity<Map<String, Object>> getExerciseById(@PathVariable Long id) {
+		return exercises.stream().filter(e -> e.get("id").equals(id)).findFirst().map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
+	}
 
-			response.put("exercises", exercises);
-			response.put("count", exercises.size());
-
-			return ResponseEntity.ok(response);
-		} catch (Exception e) {
-			// Log del error para debugging
-			System.err.println("Error en getExercises: " + e.getMessage());
-			e.printStackTrace();
-			throw e;
-		}
+	// GET /api/exercises?search=query
+	@GetMapping(value = "/exercises", params = "search")
+	public ResponseEntity<List<Map<String, Object>>> searchExercises(@RequestParam String search) {
+		String query = search.toLowerCase();
+		List<Map<String, Object>> results = exercises.stream()
+				.filter(e -> e.get("name").toString().toLowerCase().contains(query)
+						|| e.get("category").toString().toLowerCase().contains(query))
+				.collect(Collectors.toList());
+		return ResponseEntity.ok(results);
 	}
 
 	private Map<String, Object> createExercise(Long id, String name, String category, String description) {

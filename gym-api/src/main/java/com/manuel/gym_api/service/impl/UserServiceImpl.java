@@ -53,4 +53,25 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 		return userMapper.toDTO(user);
 	}
+
+	@Override
+	@Transactional
+	public UserDTO updateUser(Long id, UserDTO updateDTO) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+
+		if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
+			user.setUsername(updateDTO.getUsername());
+		}
+		if (updateDTO.getEmail() != null && !updateDTO.getEmail().isBlank()) {
+			user.setEmail(updateDTO.getEmail());
+		}
+		if (updateDTO.getLanguagePreference() != null) {
+			user.setLanguagePreference(updateDTO.getLanguagePreference());
+		}
+		user.setPublicProfile(updateDTO.isPublicProfile());
+
+		User savedUser = userRepository.save(user);
+		return userMapper.toDTO(savedUser);
+	}
 }
