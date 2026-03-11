@@ -58,17 +58,41 @@ public class SecurityConfigurations {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 
-		// Permitir todas las origins para desarrollo
-		configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+		// Configuración específica para emulador Android y desarrollo
+		configuration.setAllowedOriginPatterns(Arrays.asList(
+			"*", // Permitir todas las origins para desarrollo
+			"http://10.0.2.2:*", // Emulador Android
+			"http://localhost:*", // Desarrollo local
+			"http://127.0.0.1:*" // Desarrollo local alternativo
+		));
 
-		// Permitir todos los métodos HTTP
+		// Permitir todos los métodos HTTP necesarios
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
-		// Permitir todos los headers
-		configuration.setAllowedHeaders(Arrays.asList("*"));
+		// Permitir headers específicos para autenticación JWT
+		configuration.setAllowedHeaders(Arrays.asList(
+			"*", // Permitir todos los headers
+			"Authorization", // Header JWT
+			"Content-Type", // Tipo de contenido
+			"Accept", // Aceptar respuesta
+			"Origin", // Origen de la petición
+			"Access-Control-Request-Method", // Método de la petición CORS
+			"Access-Control-Request-Headers" // Headers de la petición CORS
+		));
 
-		// Permitir credenciales
+		// Exponer headers de respuesta necesarios
+		configuration.setExposedHeaders(Arrays.asList(
+			"Authorization",
+			"Content-Type",
+			"Access-Control-Allow-Origin",
+			"Access-Control-Allow-Credentials"
+		));
+
+		// Permitir credenciales (necesario para JWT)
 		configuration.setAllowCredentials(true);
+
+		// Configurar tiempo de cache para preflight requests
+		configuration.setMaxAge(3600L);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);

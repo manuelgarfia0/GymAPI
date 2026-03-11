@@ -3,10 +3,13 @@ package com.manuel.gym_api.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,23 +46,58 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
 		try {
+			// Log de intento de login para debugging
+			System.out.println("Intento de login para usuario: " + loginDTO.getUsername());
+
+			// Validación adicional de entrada
+			if (loginDTO.getUsername() == null || loginDTO.getUsername().trim().isEmpty()) {
+				System.err.println("Error: Username vacío o nulo");
+				throw new IllegalArgumentException("Username cannot be empty");
+			}
+			if (loginDTO.getPassword() == null || loginDTO.getPassword().trim().isEmpty()) {
+				System.err.println("Error: Password vacío o nulo");
+				throw new IllegalArgumentException("Password cannot be empty");
+			}
+
 			// Creamos un token interno de Spring con usuario y contraseña
 			UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
-					loginDTO.getUsername(), loginDTO.getPassword());
+					loginDTO.getUsername().trim(), loginDTO.getPassword());
+
+			System.out.println("Intentando autenticar usuario: " + loginDTO.getUsername().trim());
 
 			// El AuthenticationManager irá automáticamente al AuthService que creamos a
 			// buscar al usuario y usará el PasswordEncoder para comprobar que la contraseña
 			// coincide.
 			Authentication auth = this.authenticationManager.authenticate(usernamePassword);
 
+			System.out.println("Autenticación exitosa para usuario: " + loginDTO.getUsername().trim());
+
 			// Si todo fue bien, generamos nuestro JWT real
 			var token = tokenService.generateToken((User) auth.getPrincipal());
+			
+			System.out.println("Token JWT generado exitosamente para usuario: " + loginDTO.getUsername().trim());
+
 			return ResponseEntity.ok(new TokenDTO(token));
-		} catch (Exception e) {
-			// Log del error para debugging
-			System.err.println("Error en login: " + e.getMessage());
+		} catch (BadCredentialsException e) {
+			// Error específico de credenciales inválidas
+			System.err.println("Credenciales inválidas para usuario: " + loginDTO.getUsername());
+			throw e; // Se maneja en GlobalExceptionHandler
+		} catch (UsernameNotFoundException e) {
+			// Error específico de usuario no encontrado
+			System.err.println("Usuario no encontrado: " + loginDTO.getUsername());
+			throw e; // Se maneja en GlobalExceptionHandler
+		} catch (DataAccessException e) {
+			// Error específico de base de datos
+			System.err.println("Error de base de datos durante login: " + e.getMessage());
 			e.printStackTrace();
-			throw e;
+			throw e; // Se maneja en GlobalExceptionHandler
+		} catch (Exception e) {
+			// Log detallado del error para debugging
+			System.err.println("Error inesperado en login para usuario: " + loginDTO.getUsername());
+			System.err.println("Tipo de error: " + e.getClass().getSimpleName());
+			System.err.println("Mensaje de error: " + e.getMessage());
+			e.printStackTrace();
+			throw e; // Se maneja en GlobalExceptionHandler
 		}
 	}
 
