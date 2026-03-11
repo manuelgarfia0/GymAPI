@@ -1,5 +1,7 @@
 package com.manuel.gym_api.security;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -22,11 +27,41 @@ public class SecurityConfigurations {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 		return httpSecurity.csrf(csrf -> csrf.disable())
-				// CAMBIO AQUÍ: usamos sessionCreationPolicy() y SessionCreationPolicy.STATELESS
+				.cors(cors -> cors.configurationSource(corsConfigurationSource())) // AGREGAR CORS
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, "/api/users/register")
-						.permitAll().requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll().anyRequest()
-						.authenticated())
+				.authorizeHttpRequests(authorize -> authorize
+						// Permitir endpoints de autenticación
+						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+						.requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
+						// Permitir health checks
+						.requestMatchers("/actuator/**", "/health").permitAll()
+						// TEMPORAL: Permitir todos los endpoints para testing
+						.requestMatchers("/api/**").permitAll()
+						// Requerir autenticación para todo lo demás
+						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		// Permitir todas las origins para desarrollo
+		configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+
+		// Permitir todos los métodos HTTP
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+		// Permitir todos los headers
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+
+		// Permitir credenciales
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+
+		return source;
 	}
 }
