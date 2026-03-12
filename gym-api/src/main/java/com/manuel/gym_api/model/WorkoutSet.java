@@ -38,6 +38,9 @@ public class WorkoutSet {
 	@Column(nullable = false)
 	private Integer reps; // Repeticiones reales conseguidas
 
+	@Column(length = 500)
+	private String notes;
+
 	@Column(name = "is_warmup", nullable = false)
 	private boolean isWarmup = false; // Para marcar series de calentamiento
 
@@ -102,6 +105,14 @@ public class WorkoutSet {
 
 	public void setReps(Integer reps) {
 		this.reps = reps;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public boolean isWarmup() {

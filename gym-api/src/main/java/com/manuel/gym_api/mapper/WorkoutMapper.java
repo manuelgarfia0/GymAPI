@@ -57,6 +57,7 @@ public class WorkoutMapper {
 		dto.setSetNumber(set.getSetNumber());
 		dto.setWeight(set.getWeight());
 		dto.setReps(set.getReps());
+		dto.setNotes(set.getNotes());
 		dto.setWarmup(set.isWarmup());
 		dto.setCompleted(set.isCompleted());
 
@@ -83,6 +84,7 @@ public class WorkoutMapper {
 		set.setSetNumber(dto.getSetNumber());
 		set.setWeight(dto.getWeight());
 		set.setReps(dto.getReps());
+		set.setNotes(dto.getNotes());
 		set.setWarmup(dto.isWarmup());
 		set.setCompleted(dto.isCompleted());
 

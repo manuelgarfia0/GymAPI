@@ -1,5 +1,6 @@
 package com.manuel.gym_api.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,6 +99,14 @@ public class WorkoutServiceImpl implements WorkoutService {
 			throw new ResourceNotFoundException("Cannot delete. Workout not found with ID: " + id);
 		}
 		workoutRepository.deleteById(id);
+	}
+
+	@Override
+	@Transactional
+	public WorkoutDTO endWorkout(Long id) {
+		Workout workout = getWorkoutOrThrow(id);
+		workout.setEndTime(LocalDateTime.now());
+		return workoutMapper.toDTO(workoutRepository.save(workout));
 	}
 
 	private void assignSetsToWorkout(Workout workout, List<WorkoutSetDTO> setDTOs) {

@@ -1,60 +1,45 @@
-package com.manuel.gym_api.controller;
-
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.manuel.gym_api.dto.ExerciseDTO;
+import com.manuel.gym_api.dto.WorkoutDTO;
+import com.manuel.gym_api.service.ExerciseService;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/exercises")
 public class ExerciseController {
 
-	// Lista fija de ejercicios (reemplazar con servicio real cuando esté listo)
-	private final List<Map<String, Object>> exercises = Arrays.asList(
-			createExercise(1L, "Push-ups", "Chest", "Bodyweight exercise for chest and arms"),
-			createExercise(2L, "Squats", "Legs", "Lower body compound exercise"),
-			createExercise(3L, "Pull-ups", "Back", "Upper body pulling exercise"),
-			createExercise(4L, "Bench Press", "Chest", "Barbell chest exercise"),
-			createExercise(5L, "Deadlift", "Full Body", "Compound lifting exercise"));
+	private final ExerciseService exerciseService;
 
-	// GET /api/exercises — devuelve la lista directamente (sin wrapper)
-	@GetMapping("/exercises")
-	public ResponseEntity<List<Map<String, Object>>> getExercises() {
-		return ResponseEntity.ok(exercises);
+	public ExerciseController(ExerciseService exerciseService) {
+		this.exerciseService = exerciseService;
 	}
 
-	// GET /api/exercises/{id}
-	@GetMapping("/exercises/{id}")
-	public ResponseEntity<Map<String, Object>> getExerciseById(@PathVariable Long id) {
-		return exercises.stream().filter(e -> e.get("id").equals(id)).findFirst().map(ResponseEntity::ok)
-				.orElse(ResponseEntity.notFound().build());
+	@GetMapping
+	public ResponseEntity<List<ExerciseDTO>> getExercises() {
+		return ResponseEntity.ok(exerciseService.getAllExercises());
 	}
 
-	// GET /api/exercises?search=query
-	@GetMapping(value = "/exercises", params = "search")
-	public ResponseEntity<List<Map<String, Object>>> searchExercises(@RequestParam String search) {
-		String query = search.toLowerCase();
-		List<Map<String, Object>> results = exercises.stream()
-				.filter(e -> e.get("name").toString().toLowerCase().contains(query)
-						|| e.get("category").toString().toLowerCase().contains(query))
-				.collect(Collectors.toList());
-		return ResponseEntity.ok(results);
+	@GetMapping("/{id}")
+	public ResponseEntity<ExerciseDTO> getExerciseById(@PathVariable Long id) {
+		return ResponseEntity.ok(exerciseService.getExerciseById(id));
 	}
 
-	private Map<String, Object> createExercise(Long id, String name, String category, String description) {
-		Map<String, Object> exercise = new HashMap<>();
-		exercise.put("id", id);
-		exercise.put("name", name);
-		exercise.put("category", category);
-		exercise.put("description", description);
-		return exercise;
+	@GetMapping(params = "search")
+	public ResponseEntity<List<ExerciseDTO>> searchExercises(@RequestParam String search) {
+		// Implementar búsqueda en ExerciseService
+		return ResponseEntity.ok(exerciseService.searchExercises(search));
+	}
+
+	@PatchMapping("/{id}/end")
+	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id) {
+		return ResponseEntity.ok(workoutService.endWorkout(id));
 	}
 }

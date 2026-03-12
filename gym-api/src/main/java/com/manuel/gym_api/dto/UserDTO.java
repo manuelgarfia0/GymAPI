@@ -2,10 +2,13 @@ package com.manuel.gym_api.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserDTO {
 	private Long id;
 	private String username;
 	private String email;
+	@JsonProperty("isPremium")
 	private boolean isPremium;
 	private String languagePreference;
 	private LocalDateTime createdAt;

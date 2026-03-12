@@ -1,8 +1,7 @@
 package com.manuel.gym_api.security;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,9 @@ public class TokenService {
 		}
 	}
 
-	// El token durará 2 horas (puedes cambiarlo a lo que prefieras para la app
+	// El token durará 24 horas (puedes cambiarlo a lo que prefieras para la app
 	// móvil)
 	private Instant generateExpirationDate() {
-		return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-05:00"));
+		return Instant.now().plus(2, ChronoUnit.HOURS);
 	}
 }

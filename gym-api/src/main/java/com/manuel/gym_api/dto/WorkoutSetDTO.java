@@ -26,6 +26,8 @@ public class WorkoutSetDTO {
 	@Min(value = 0, message = "Las repeticiones no pueden ser negativas")
 	private Integer reps;
 
+	private String notes;
+
 	private boolean isWarmup;
 	private boolean isCompleted;
 
@@ -87,6 +89,14 @@ public class WorkoutSetDTO {
 
 	public void setReps(Integer reps) {
 		this.reps = reps;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public boolean isWarmup() {

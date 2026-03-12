@@ -74,7 +74,7 @@ public class AuthController {
 
 			// Si todo fue bien, generamos nuestro JWT real
 			var token = tokenService.generateToken((User) auth.getPrincipal());
-			
+
 			System.out.println("Token JWT generado exitosamente para usuario: " + loginDTO.getUsername().trim());
 
 			return ResponseEntity.ok(new TokenDTO(token));
