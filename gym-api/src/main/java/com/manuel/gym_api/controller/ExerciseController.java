@@ -1,15 +1,15 @@
+package com.manuel.gym_api.controller;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.ExerciseDTO;
-import com.manuel.gym_api.dto.WorkoutDTO;
 import com.manuel.gym_api.service.ExerciseService;
 
 @RestController
@@ -36,10 +36,5 @@ public class ExerciseController {
 	public ResponseEntity<List<ExerciseDTO>> searchExercises(@RequestParam String search) {
 		// Implementar búsqueda en ExerciseService
 		return ResponseEntity.ok(exerciseService.searchExercises(search));
-	}
-
-	@PatchMapping("/{id}/end")
-	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id) {
-		return ResponseEntity.ok(workoutService.endWorkout(id));
 	}
 }

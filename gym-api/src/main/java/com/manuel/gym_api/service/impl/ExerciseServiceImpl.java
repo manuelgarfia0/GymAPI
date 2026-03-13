@@ -73,4 +73,10 @@ public class ExerciseServiceImpl implements ExerciseService {
 		}
 		repository.deleteById(id);
 	}
+
+	@Override
+	public List<ExerciseDTO> searchExercises(String query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

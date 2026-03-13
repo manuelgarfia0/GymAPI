@@ -1,31 +1,41 @@
 package com.manuel.gym_api.service.impl;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.manuel.gym_api.dto.ExerciseImportDTO;
+import com.manuel.gym_api.model.Equipment;
 import com.manuel.gym_api.model.Exercise;
+import com.manuel.gym_api.model.Muscle;
 import com.manuel.gym_api.repository.EquipmentRepository;
 import com.manuel.gym_api.repository.ExerciseRepository;
 import com.manuel.gym_api.repository.MuscleRepository;
 import com.manuel.gym_api.service.ExerciseImportService;
 
+import tools.jackson.databind.ObjectMapper;
+
 @Service
 public class ExerciseImportServiceImpl implements ExerciseImportService {
 
+	private static final Logger log = LoggerFactory.getLogger(ExerciseImportServiceImpl.class);
+	private static final String EXERCISES_JSON_PATH = "exercises.json";
+
+	private final ObjectMapper objectMapper;
 	private final ExerciseRepository exerciseRepository;
 	private final MuscleRepository muscleRepository;
 	private final EquipmentRepository equipmentRepository;
 
-	public ExerciseImportServiceImpl(ExerciseRepository exerciseRepository, MuscleRepository muscleRepository,
-			EquipmentRepository equipmentRepository) {
+	public ExerciseImportServiceImpl(ObjectMapper objectMapper, ExerciseRepository exerciseRepository,
+			MuscleRepository muscleRepository, EquipmentRepository equipmentRepository) {
+		this.objectMapper = objectMapper;
 		this.exerciseRepository = exerciseRepository;
 		this.muscleRepository = muscleRepository;
 		this.equipmentRepository = equipmentRepository;
@@ -34,117 +44,89 @@ public class ExerciseImportServiceImpl implements ExerciseImportService {
 	@Override
 	@Transactional
 	public void importExercises() {
+		List<ExerciseImportDTO> exercises = loadExercisesFromJson();
+
+		if (exercises.isEmpty()) {
+			log.warn("No exercises found in {}", EXERCISES_JSON_PATH);
+			return;
+		}
+
+		int imported = 0;
+		int skipped = 0;
+
+		for (ExerciseImportDTO dto : exercises) {
+			if (dto.getName() == null || dto.getName().isBlank()) {
+				log.warn("Skipping exercise with empty name");
+				skipped++;
+				continue;
+			}
+
+			if (exerciseRepository.existsByNameIgnoreCase(dto.getName())) {
+				log.debug("Exercise '{}' already exists, skipping", dto.getName());
+				skipped++;
+				continue;
+			}
+
+			Exercise exercise = mapToEntity(dto);
+			exerciseRepository.save(exercise);
+			imported++;
+		}
+
+		log.info("Exercise import complete — imported: {}, skipped: {}", imported, skipped);
+	}
+
+	private List<ExerciseImportDTO> loadExercisesFromJson() {
 		try {
-			ClassPathResource resource = new ClassPathResource("exercises.json");
-			InputStream inputStream = resource.getInputStream();
+			ClassPathResource resource = new ClassPathResource(EXERCISES_JSON_PATH);
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-			StringBuilder jsonBuilder = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				jsonBuilder.append(line);
-			}
-			String jsonContent = jsonBuilder.toString();
-
-			List<Exercise> exercisesToSave = parseJsonManually(jsonContent);
-
-			int count = 0;
-			for (Exercise ex : exercisesToSave) {
-				if (!exerciseRepository.existsByNameIgnoreCase(ex.getName())) {
-					exerciseRepository.save(ex);
-					count++;
-				}
+			if (!resource.exists()) {
+				log.error("Resource file not found: {}", EXERCISES_JSON_PATH);
+				return new ArrayList<>();
 			}
 
-			System.out.println("Importación local finalizada. Se han guardado " + count + " ejercicios base.");
+			ExerciseImportDTO[] array = objectMapper.readValue(resource.getInputStream(), ExerciseImportDTO[].class);
+			return Arrays.asList(array);
 
-		} catch (Exception e) {
-			System.err.println("Error fatal importando ejercicios locales: " + e.getMessage());
-			e.printStackTrace();
+		} catch (IOException e) {
+			log.error("Failed to parse {}: {}", EXERCISES_JSON_PATH, e.getMessage());
+			return new ArrayList<>();
 		}
 	}
 
-	private List<Exercise> parseJsonManually(String json) {
-		List<Exercise> exercises = new ArrayList<>();
-		String[] blocks = json.split("\\{");
+	private Exercise mapToEntity(ExerciseImportDTO dto) {
+		Exercise exercise = new Exercise();
+		exercise.setName(dto.getName());
+		exercise.setDescription(dto.getDescription());
 
-		for (String block : blocks) {
-			if (block.contains("\"name\"") && block.contains("\"description\"")) {
-				try {
-					String name = extractStringValue(block, "\"name\"");
-					String description = extractStringValue(block, "\"description\"");
-
-					Long primaryId = extractLongValue(block, "\"primary_muscle_id\"");
-					Long equipmentId = extractLongValue(block, "\"equipment_id\"");
-					List<Long> secondaryIds = extractLongArray(block, "\"secondary_muscle_ids\"");
-
-					Exercise ex = new Exercise();
-					ex.setName(name);
-					ex.setDescription(description);
-					ex.setSystemExercise(true);
-
-					if (primaryId != null) {
-						muscleRepository.findById(primaryId).ifPresent(ex::setPrimaryMuscle);
-					}
-
-					if (equipmentId != null) {
-						equipmentRepository.findById(equipmentId).ifPresent(ex::setEquipment);
-					}
-
-					for (Long secId : secondaryIds) {
-						muscleRepository.findById(secId).ifPresent(m -> ex.getSecondaryMuscles().add(m));
-					}
-
-					exercises.add(ex);
-				} catch (Exception e) {
-					// Ignorar bloque roto
-				}
-			}
+		if (dto.getPrimaryMuscle() != null) {
+			exercise.setPrimaryMuscle(findOrCreateMuscle(dto.getPrimaryMuscle()));
 		}
-		return exercises;
+
+		if (dto.getEquipment() != null) {
+			exercise.setEquipment(findOrCreateEquipment(dto.getEquipment()));
+		}
+
+		if (dto.getSecondaryMuscles() != null && !dto.getSecondaryMuscles().isEmpty()) {
+			dto.getSecondaryMuscles()
+					.forEach(muscleName -> exercise.getSecondaryMuscles().add(findOrCreateMuscle(muscleName)));
+		}
+
+		return exercise;
 	}
 
-	private String extractStringValue(String block, String key) {
-		try {
-			String part = block.split(key + "\\s*:\\s*\"")[1];
-			return part.substring(0, part.indexOf("\"")).trim();
-		} catch (Exception e) {
-			return "";
-		}
+	private Muscle findOrCreateMuscle(String name) {
+		return muscleRepository.findByNameIgnoreCase(name).orElseGet(() -> {
+			Muscle muscle = new Muscle();
+			muscle.setName(name);
+			return muscleRepository.save(muscle);
+		});
 	}
 
-	private Long extractLongValue(String block, String key) {
-		try {
-			String part = block.split(key + "\\s*:\\s*")[1];
-			// Quitamos las comas, los saltos de línea y los espacios de alrededor del
-			// número
-			String numberStr = part.split("[,}\\n]")[0].trim();
-			if (numberStr.equals("null"))
-				return null;
-			return Long.parseLong(numberStr);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	private List<Long> extractLongArray(String block, String key) {
-		List<Long> result = new ArrayList<>();
-		try {
-			if (!block.contains(key))
-				return result;
-
-			String part = block.split(key + "\\s*:\\s*\\[")[1];
-			String arrayStr = part.split("\\]")[0].trim();
-			if (arrayStr.isEmpty())
-				return result;
-
-			String[] numbers = arrayStr.split(",");
-			for (String num : numbers) {
-				result.add(Long.parseLong(num.trim()));
-			}
-		} catch (Exception e) {
-			// Ignorar
-		}
-		return result;
+	private Equipment findOrCreateEquipment(String name) {
+		return equipmentRepository.findByNameIgnoreCase(name).orElseGet(() -> {
+			Equipment equipment = new Equipment();
+			equipment.setName(name);
+			return equipmentRepository.save(equipment);
+		});
 	}
 }
