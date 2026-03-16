@@ -47,12 +47,23 @@ public class WorkoutController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<WorkoutDTO> updateWorkout(@PathVariable Long id, @RequestBody @Valid WorkoutDTO workoutDTO) {
+	public ResponseEntity<WorkoutDTO> updateWorkout(@PathVariable Long id, @RequestBody @Valid WorkoutDTO workoutDTO,
+			Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		WorkoutDTO workout = workoutService.getWorkoutById(id);
+		if (!workout.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
 		return ResponseEntity.ok(workoutService.updateWorkout(id, workoutDTO));
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteWorkout(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteWorkout(@PathVariable Long id, Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		WorkoutDTO workout = workoutService.getWorkoutById(id);
+		if (!workout.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
 		workoutService.deleteWorkout(id);
 		return ResponseEntity.noContent().build();
 	}
@@ -70,7 +81,12 @@ public class WorkoutController {
 
 	// Flutter llama a PATCH /api/workouts/{id}/end
 	@PatchMapping("/{id}/end")
-	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id) {
+	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id, Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		WorkoutDTO workout = workoutService.getWorkoutById(id);
+		if (!workout.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
 		return ResponseEntity.ok(workoutService.endWorkout(id));
 	}
 }

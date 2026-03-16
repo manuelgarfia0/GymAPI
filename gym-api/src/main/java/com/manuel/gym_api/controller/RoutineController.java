@@ -58,12 +58,23 @@ public class RoutineController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<RoutineDTO> updateRoutine(@PathVariable Long id, @RequestBody @Valid RoutineDTO routineDTO) {
+	public ResponseEntity<RoutineDTO> updateRoutine(@PathVariable Long id, @RequestBody @Valid RoutineDTO routineDTO,
+			Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		RoutineDTO routine = routineService.getRoutineById(id);
+		if (!routine.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
 		return ResponseEntity.ok(routineService.updateRoutine(id, routineDTO));
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteRoutine(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteRoutine(@PathVariable Long id, Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		RoutineDTO routine = routineService.getRoutineById(id);
+		if (!routine.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
 		routineService.deleteRoutine(id);
 		return ResponseEntity.noContent().build();
 	}
