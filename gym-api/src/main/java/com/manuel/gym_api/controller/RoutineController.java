@@ -43,8 +43,13 @@ public class RoutineController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<RoutineDTO> getRoutineById(@PathVariable Long id) {
-		return ResponseEntity.ok(routineService.getRoutineById(id));
+	public ResponseEntity<RoutineDTO> getRoutineById(@PathVariable Long id, Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		RoutineDTO routine = routineService.getRoutineById(id);
+		if (!profileAccessService.canViewRoutines(currentUser.getId(), routine.getUserId())) {
+			return ResponseEntity.status(403).build();
+		}
+		return ResponseEntity.ok(routine);
 	}
 
 	@GetMapping("/user/{userId}")

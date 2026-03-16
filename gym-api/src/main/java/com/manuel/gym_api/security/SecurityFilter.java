@@ -57,7 +57,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 		if (authHeader == null)
 			return null;
 
-		// Reemplazamos "Bearer " por nada para quedarnos solo con la cadena del token
-		return authHeader.replace("Bearer ", "");
+		if (!authHeader.startsWith("Bearer "))
+			return null;
+		return authHeader.substring(7);
 	}
 }

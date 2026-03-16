@@ -42,8 +42,13 @@ public class WorkoutController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<WorkoutDTO> getWorkoutById(@PathVariable Long id) {
-		return ResponseEntity.ok(workoutService.getWorkoutById(id));
+	public ResponseEntity<WorkoutDTO> getWorkoutById(@PathVariable Long id, Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		WorkoutDTO workout = workoutService.getWorkoutById(id);
+		if (!workout.getUserId().equals(currentUser.getId())) {
+			return ResponseEntity.status(403).build();
+		}
+		return ResponseEntity.ok(workout);
 	}
 
 	@PutMapping("/{id}")
