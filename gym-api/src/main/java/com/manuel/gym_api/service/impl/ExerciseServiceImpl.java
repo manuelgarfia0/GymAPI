@@ -66,17 +66,16 @@ public class ExerciseServiceImpl implements ExerciseService {
 	}
 
 	@Override
+	public List<ExerciseDTO> searchExercises(String query) {
+		return repository.findByNameContainingIgnoreCase(query).stream().map(exerciseMapper::toDTO).toList();
+	}
+
+	@Override
 	@Transactional
 	public void deleteExercise(Long id) {
 		if (!repository.existsById(id)) {
 			throw new ResourceNotFoundException("Cannot delete. Exercise not found with ID: " + id);
 		}
 		repository.deleteById(id);
-	}
-
-	@Override
-	public List<ExerciseDTO> searchExercises(String query) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
