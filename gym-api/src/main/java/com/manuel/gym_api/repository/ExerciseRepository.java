@@ -2,6 +2,8 @@ package com.manuel.gym_api.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +15,6 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
 	boolean existsByNameIgnoreCase(String name);
 
 	List<Exercise> findByNameContainingIgnoreCase(String name);
+	
+	Page<Exercise> findAll(Pageable pageable);
 }

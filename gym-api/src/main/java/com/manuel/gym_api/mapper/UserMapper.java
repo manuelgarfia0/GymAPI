@@ -17,6 +17,7 @@ public class UserMapper {
 			result.setUsername(user.getUsername());
 			result.setEmail(user.getEmail());
 			result.setPremium(user.isPremium());
+			result.setPublicProfile(user.isPublicProfile());
 			result.setLanguagePreference(user.getLanguagePreference());
 			result.setCreatedAt(user.getCreatedAt());
 		}

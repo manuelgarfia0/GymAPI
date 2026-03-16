@@ -2,6 +2,9 @@ package com.manuel.gym_api.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +26,11 @@ public class ExerciseController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<ExerciseDTO>> getExercises() {
-		return ResponseEntity.ok(exerciseService.getAllExercises());
+	public ResponseEntity<Page<ExerciseDTO>> getExercises(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "20") int size) {
+
+		PageRequest pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+		return ResponseEntity.ok(exerciseService.getAllExercises(pageable));
 	}
 
 	@GetMapping("/{id}")

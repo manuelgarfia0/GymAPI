@@ -17,6 +17,8 @@ public class TokenService {
 
 	@Value("${api.security.secret:MySuperSecretGymAppKey123!}")
 	private String apiSecret;
+	@Value("${api.security.token.expiration-hours:24}")
+	private int expirationHours;
 
 	public String generateToken(User user) {
 		try {
@@ -45,6 +47,6 @@ public class TokenService {
 	// El token durará 24 horas (puedes cambiarlo a lo que prefieras para la app
 	// móvil)
 	private Instant generateExpirationDate() {
-		return Instant.now().plus(2, ChronoUnit.HOURS);
+		return Instant.now().plus(expirationHours, ChronoUnit.HOURS);
 	}
 }

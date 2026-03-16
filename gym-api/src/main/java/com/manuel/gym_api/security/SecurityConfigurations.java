@@ -60,7 +60,7 @@ public class SecurityConfigurations {
 
 		// Configuración específica para emulador Android y desarrollo
 		configuration.setAllowedOriginPatterns(Arrays.asList(
-			"*", // Permitir todas las origins para desarrollo
+			"${cors.allowed-origins}",
 			"http://10.0.2.2:*", // Emulador Android
 			"http://localhost:*", // Desarrollo local
 			"http://127.0.0.1:*" // Desarrollo local alternativo
