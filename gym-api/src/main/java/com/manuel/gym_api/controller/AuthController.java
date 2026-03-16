@@ -3,13 +3,13 @@ package com.manuel.gym_api.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +34,7 @@ public class AuthController {
 	private final TokenService tokenService;
 	private final UserService userService;
 	private final AuthService authService;
+	private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
 	public AuthController(AuthenticationManager authenticationManager, TokenService tokenService,
 			UserService userService, AuthService authService) {
@@ -46,14 +47,6 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<TokenDTO> login(@RequestBody @Valid LoginDTO loginDTO) {
 		try {
-			// Validación adicional de entrada
-			if (loginDTO.getUsername() == null || loginDTO.getUsername().trim().isEmpty()) {
-				throw new IllegalArgumentException("Username cannot be empty");
-			}
-			if (loginDTO.getPassword() == null || loginDTO.getPassword().trim().isEmpty()) {
-				throw new IllegalArgumentException("Password cannot be empty");
-			}
-
 			// Creamos un token interno de Spring con usuario y contraseña
 			UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
 					loginDTO.getUsername().trim(), loginDTO.getPassword());
@@ -67,19 +60,13 @@ public class AuthController {
 			var token = tokenService.generateToken((User) auth.getPrincipal());
 
 			return ResponseEntity.ok(new TokenDTO(token));
-		} catch (BadCredentialsException e) {
-			// Error específico de credenciales inválidas
-			throw e; // Se maneja en GlobalExceptionHandler
-		} catch (UsernameNotFoundException e) {
-			// Error específico de usuario no encontrado
-			throw e; // Se maneja en GlobalExceptionHandler
 		} catch (DataAccessException e) {
 			// Error específico de base de datos
-			e.printStackTrace();
-			throw e; // Se maneja en GlobalExceptionHandler
+			log.error("Database error during login for user: {}", loginDTO.getUsername(), e);
+			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw e; // Se maneja en GlobalExceptionHandler
+			log.error("Unexpected error during login for user: {}", loginDTO.getUsername(), e);
+			throw e;
 		}
 	}
 
@@ -94,7 +81,7 @@ public class AuthController {
 
 			return ResponseEntity.ok(new TokenDTO(token));
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error during registration for user: {}", registrationDTO.getUsername(), e);
 			throw e;
 		}
 	}
@@ -123,7 +110,7 @@ public class AuthController {
 			}
 		} catch (Exception e) {
 			// Log del error para debugging
-			e.printStackTrace();
+			log.error("Error fetching current user", e);
 			throw e;
 		}
 	}

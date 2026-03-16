@@ -2,6 +2,7 @@ package com.manuel.gym_api.security;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,6 +20,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfigurations {
 
 	private final SecurityFilter securityFilter;
+	@Value("${cors.allowed-origins}")
+	private String allowedOrigins;
 
 	public SecurityConfigurations(SecurityFilter securityFilter) {
 		this.securityFilter = securityFilter;
@@ -59,34 +62,24 @@ public class SecurityConfigurations {
 		CorsConfiguration configuration = new CorsConfiguration();
 
 		// Configuración específica para emulador Android y desarrollo
-		configuration.setAllowedOriginPatterns(Arrays.asList(
-			"${cors.allowed-origins}",
-			"http://10.0.2.2:*", // Emulador Android
-			"http://localhost:*", // Desarrollo local
-			"http://127.0.0.1:*" // Desarrollo local alternativo
-		));
+		configuration.setAllowedOriginPatterns(Arrays.asList(allowedOrigins.split(",")));
 
 		// Permitir todos los métodos HTTP necesarios
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
 		// Permitir headers específicos para autenticación JWT
-		configuration.setAllowedHeaders(Arrays.asList(
-			"*", // Permitir todos los headers
-			"Authorization", // Header JWT
-			"Content-Type", // Tipo de contenido
-			"Accept", // Aceptar respuesta
-			"Origin", // Origen de la petición
-			"Access-Control-Request-Method", // Método de la petición CORS
-			"Access-Control-Request-Headers" // Headers de la petición CORS
+		configuration.setAllowedHeaders(Arrays.asList("*", // Permitir todos los headers
+				"Authorization", // Header JWT
+				"Content-Type", // Tipo de contenido
+				"Accept", // Aceptar respuesta
+				"Origin", // Origen de la petición
+				"Access-Control-Request-Method", // Método de la petición CORS
+				"Access-Control-Request-Headers" // Headers de la petición CORS
 		));
 
 		// Exponer headers de respuesta necesarios
-		configuration.setExposedHeaders(Arrays.asList(
-			"Authorization",
-			"Content-Type",
-			"Access-Control-Allow-Origin",
-			"Access-Control-Allow-Credentials"
-		));
+		configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type", "Access-Control-Allow-Origin",
+				"Access-Control-Allow-Credentials"));
 
 		// Permitir credenciales (necesario para JWT)
 		configuration.setAllowCredentials(true);

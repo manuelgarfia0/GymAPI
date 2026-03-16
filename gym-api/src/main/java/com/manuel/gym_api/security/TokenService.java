@@ -15,7 +15,7 @@ import com.manuel.gym_api.model.User;
 @Service
 public class TokenService {
 
-	@Value("${api.security.secret:MySuperSecretGymAppKey123!}")
+	@Value("${api.security.secret}")
 	private String apiSecret;
 	@Value("${api.security.token.expiration-hours:24}")
 	private int expirationHours;
