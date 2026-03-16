@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.WorkoutDTO;
+import com.manuel.gym_api.model.User;
 import com.manuel.gym_api.service.WorkoutService;
 
 import jakarta.validation.Valid;
@@ -54,7 +56,12 @@ public class WorkoutController {
 
 	// Para que Flutter pueda buscar por userId con query param
 	@GetMapping
-	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserIdParam(@RequestParam Long userId) {
+	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserIdParam(@RequestParam Long userId,
+			Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		if (!currentUser.getId().equals(userId)) {
+			return ResponseEntity.status(403).build();
+		}
 		return ResponseEntity.ok(workoutService.getWorkoutsByUserId(userId));
 	}
 
