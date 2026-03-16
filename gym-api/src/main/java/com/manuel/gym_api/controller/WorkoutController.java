@@ -41,11 +41,6 @@ public class WorkoutController {
 		return ResponseEntity.ok(workoutService.getWorkoutById(id));
 	}
 
-	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserId(@PathVariable Long userId) {
-		return ResponseEntity.ok(workoutService.getWorkoutsByUserId(userId));
-	}
-
 	@PutMapping("/{id}")
 	public ResponseEntity<WorkoutDTO> updateWorkout(@PathVariable Long id, @RequestBody @Valid WorkoutDTO workoutDTO) {
 		return ResponseEntity.ok(workoutService.updateWorkout(id, workoutDTO));

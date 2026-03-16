@@ -47,9 +47,9 @@ public class WorkoutMapper {
 
 		WorkoutSetDTO dto = new WorkoutSetDTO();
 		dto.setId(set.getId());
-		dto.setExerciseId(set.getExercise().getId());
-
-		if (set.getExercise() != null && set.getExercise().getName() != null) {
+		
+		if (set.getExercise() != null) {
+			dto.setExerciseId(set.getExercise().getId());
 			dto.setExerciseName(set.getExercise().getName());
 		}
 
