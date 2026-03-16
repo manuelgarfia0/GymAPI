@@ -33,14 +33,14 @@ public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final UserService userService;
-	private final AuthService authService; // ← AÑADIR ESTE
+	private final AuthService authService;
 
 	public AuthController(AuthenticationManager authenticationManager, TokenService tokenService,
-			UserService userService, AuthService authService) { // ← AÑADIR AL CONSTRUCTOR
+			UserService userService, AuthService authService) {
 		this.authenticationManager = authenticationManager;
 		this.tokenService = tokenService;
 		this.userService = userService;
-		this.authService = authService; // ← AÑADIR ESTO
+		this.authService = authService;
 	}
 
 	@PostMapping("/login")
