@@ -2,71 +2,71 @@
   {
     "name": "Barbell Bench Press",
     "description": "Lie on a flat bench. Grasp the barbell with a medium-width grip. Lift the bar and hold it straight over you. Breathe in and lower the bar slowly until it touches your middle chest.",
-    "primary_muscle_id": 1,
-    "secondary_muscle_ids": [4, 6],
-    "equipment_id": 1
+    "primaryMuscle": "Chest",
+    "equipment": "Barbell",
+    "secondaryMuscles": ["Shoulders", "Triceps"]
   },
   {
     "name": "Squat",
     "description": "Stand with your feet shoulder-width apart. Rest a barbell on your upper back. Bend your knees and lower your hips as if sitting in a chair. Keep your back straight. Push back up.",
-    "primary_muscle_id": 3,
-    "secondary_muscle_ids": [7],
-    "equipment_id": 1
+    "primaryMuscle": "Quadriceps",
+    "equipment": "Barbell",
+    "secondaryMuscles": ["Core"]
   },
   {
     "name": "Deadlift",
     "description": "Stand with your mid-foot under the barbell. Bend over and grab the bar with a shoulder-width grip. Bend your knees until your shins touch the bar. Lift your chest up and straighten.",
-    "primary_muscle_id": 2,
-    "secondary_muscle_ids": [3, 7],
-    "equipment_id": 1
+    "primaryMuscle": "Back",
+    "equipment": "Barbell",
+    "secondaryMuscles": ["Quadriceps", "Core"]
   },
   {
     "name": "Pull-up",
     "description": "Grab the pull-up bar with your palms facing forward. Hang with your arms fully extended. Pull yourself up until your chin is over the bar. Lower yourself back down with control.",
-    "primary_muscle_id": 2,
-    "secondary_muscle_ids": [5, 7],
-    "equipment_id": 4
+    "primaryMuscle": "Back",
+    "equipment": "Bodyweight",
+    "secondaryMuscles": ["Biceps", "Core"]
   },
   {
     "name": "Overhead Press",
     "description": "Stand holding a barbell at shoulder height. Press the bar straight up overhead until your arms are fully extended. Lower the bar back down to your shoulders.",
-    "primary_muscle_id": 4,
-    "secondary_muscle_ids": [6, 7],
-    "equipment_id": 1
+    "primaryMuscle": "Shoulders",
+    "equipment": "Barbell",
+    "secondaryMuscles": ["Triceps", "Core"]
   },
   {
     "name": "Barbell Row",
     "description": "Bend over holding a barbell. Keep your back straight and parallel to the floor. Pull the bar to your lower chest. Lower it back down with control.",
-    "primary_muscle_id": 2,
-    "secondary_muscle_ids": [5, 4],
-    "equipment_id": 1
+    "primaryMuscle": "Back",
+    "equipment": "Barbell",
+    "secondaryMuscles": ["Biceps", "Shoulders"]
   },
   {
     "name": "Dumbbell Curl",
     "description": "Stand holding a dumbbell in each hand. Keep your elbows close to your torso. Curl the weights up to shoulder level. Lower them back down slowly.",
-    "primary_muscle_id": 5,
-    "secondary_muscle_ids": [],
-    "equipment_id": 2
+    "primaryMuscle": "Biceps",
+    "equipment": "Dumbbell",
+    "secondaryMuscles": []
   },
   {
     "name": "Tricep Extension",
     "description": "Hold a dumbbell with both hands overhead. Lower the weight behind your head by bending your elbows. Push the weight back up to the starting position.",
-    "primary_muscle_id": 6,
-    "secondary_muscle_ids": [],
-    "equipment_id": 2
+    "primaryMuscle": "Triceps",
+    "equipment": "Dumbbell",
+    "secondaryMuscles": []
   },
   {
     "name": "Leg Press",
     "description": "Sit on the leg press machine. Place your feet on the platform shoulder-width apart. Lower the platform until your knees are bent at a 90-degree angle. Push the platform back up.",
-    "primary_muscle_id": 3,
-    "secondary_muscle_ids": [],
-    "equipment_id": 3
+    "primaryMuscle": "Quadriceps",
+    "equipment": "Machine",
+    "secondaryMuscles": []
   },
   {
     "name": "Plank",
     "description": "Start in a push-up position. Rest on your forearms instead of your hands. Keep your body in a straight line from head to heels. Hold this position.",
-    "primary_muscle_id": 7,
-    "secondary_muscle_ids": [],
-    "equipment_id": 4
+    "primaryMuscle": "Core",
+    "equipment": "Bodyweight",
+    "secondaryMuscles": []
   }
 ]
