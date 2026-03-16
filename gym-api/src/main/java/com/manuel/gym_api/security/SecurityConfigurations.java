@@ -36,7 +36,6 @@ public class SecurityConfigurations {
 						// Permitir endpoints de autenticación sin JWT
 						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
 
 						// Permitir exercises temporalmente
 						.requestMatchers("/api/exercises").permitAll()

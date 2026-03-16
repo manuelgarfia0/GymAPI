@@ -34,7 +34,10 @@ public class RoutineController {
 	}
 
 	@PostMapping
-	public ResponseEntity<RoutineDTO> createRoutine(@RequestBody @Valid RoutineDTO routineDTO) {
+	public ResponseEntity<RoutineDTO> createRoutine(@RequestBody @Valid RoutineDTO routineDTO,
+			Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		routineDTO.setUserId(currentUser.getId());
 		RoutineDTO createdRoutine = routineService.createRoutine(routineDTO);
 		return new ResponseEntity<>(createdRoutine, HttpStatus.CREATED);
 	}

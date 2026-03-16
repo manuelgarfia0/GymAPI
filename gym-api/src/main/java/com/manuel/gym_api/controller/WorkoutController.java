@@ -33,7 +33,10 @@ public class WorkoutController {
 	}
 
 	@PostMapping
-	public ResponseEntity<WorkoutDTO> createWorkout(@RequestBody @Valid WorkoutDTO workoutDTO) {
+	public ResponseEntity<WorkoutDTO> createWorkout(@RequestBody @Valid WorkoutDTO workoutDTO,
+			Authentication authentication) {
+		User currentUser = (User) authentication.getPrincipal();
+		workoutDTO.setUserId(currentUser.getId());
 		WorkoutDTO createdWorkout = workoutService.createWorkout(workoutDTO);
 		return new ResponseEntity<>(createdWorkout, HttpStatus.CREATED);
 	}
@@ -63,20 +66,6 @@ public class WorkoutController {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(workoutService.getWorkoutsByUserId(userId));
-	}
-
-	// Flutter llama a POST /api/workouts/save
-	@PostMapping("/save")
-	public ResponseEntity<WorkoutDTO> saveWorkout(@RequestBody @Valid WorkoutDTO workoutDTO) {
-		WorkoutDTO saved = workoutService.createWorkout(workoutDTO);
-		return ResponseEntity.ok(saved);
-	}
-
-	// Flutter llama a GET /api/workouts/active?userId=1
-	@GetMapping("/active")
-	public ResponseEntity<WorkoutDTO> getActiveWorkout(@RequestParam Long userId) {
-		// implementar lógica o devolver 404 si no hay activo
-		return ResponseEntity.notFound().build();
 	}
 
 	// Flutter llama a PATCH /api/workouts/{id}/end
