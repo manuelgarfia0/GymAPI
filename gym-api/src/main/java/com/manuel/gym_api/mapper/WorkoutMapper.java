@@ -71,7 +71,7 @@ public class WorkoutMapper {
 		workout.setStartTime(dto.getStartTime());
 		workout.setEndTime(dto.getEndTime());
 		workout.setUser(user);
-		workout.setRoutine(routine); // Puede ser null, es opcional
+		workout.setRoutine(routine);
 
 		return workout;
 	}

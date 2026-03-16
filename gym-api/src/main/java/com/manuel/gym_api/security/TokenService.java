@@ -23,11 +23,8 @@ public class TokenService {
 	public String generateToken(User user) {
 		try {
 			Algorithm algorithm = Algorithm.HMAC256(apiSecret);
-			return JWT.create().withIssuer("GymAPI") // Quien emite el token
-					.withSubject(user.getUsername()) // A quién pertenece
-					.withClaim("id", user.getId()) // Guardamos el ID para usarlo luego si lo necesitamos
-					.withExpiresAt(generateExpirationDate()) // Cuándo caduca
-					.sign(algorithm);
+			return JWT.create().withIssuer("GymAPI").withSubject(user.getUsername()).withClaim("id", user.getId())
+					.withExpiresAt(generateExpirationDate()).sign(algorithm);
 		} catch (JWTCreationException exception) {
 			throw new RuntimeException("Error while generating token", exception);
 		}

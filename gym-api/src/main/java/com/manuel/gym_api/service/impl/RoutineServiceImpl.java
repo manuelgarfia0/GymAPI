@@ -98,7 +98,6 @@ public class RoutineServiceImpl implements RoutineService {
 
 		exerciseDTOs.forEach(exDTO -> {
 			Exercise exercise = getExerciseOrThrow(exDTO.getExerciseId());
-			// Como aquí recuperamos el 'exercise' de la BD, su nombre DEBE estar presente
 			routine.getRoutineExercises().add(routineMapper.toRoutineExerciseEntity(exDTO, routine, exercise));
 		});
 	}

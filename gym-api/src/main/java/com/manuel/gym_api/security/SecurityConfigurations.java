@@ -38,14 +38,6 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
 
-						// Permitir endpoints de información (GET)
-						.requestMatchers(HttpMethod.GET, "/api/auth/login").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/auth/register").permitAll()
-
-						// Permitir endpoints de test y health checks
-						.requestMatchers("/api/test", "/api/health-check").permitAll()
-						.requestMatchers("/actuator/**", "/health").permitAll()
-
 						// Permitir exercises temporalmente
 						.requestMatchers("/api/exercises").permitAll()
 

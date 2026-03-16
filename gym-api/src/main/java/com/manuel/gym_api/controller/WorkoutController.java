@@ -1,7 +1,6 @@
 package com.manuel.gym_api.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,7 @@ public class WorkoutController {
 
 	// Flutter llama a PATCH /api/workouts/{id}/end
 	@PatchMapping("/{id}/end")
-	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id, @RequestBody Map<String, String> body) {
-		return ResponseEntity.ok(workoutService.getWorkoutById(id));
+	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id) {
+		return ResponseEntity.ok(workoutService.endWorkout(id));
 	}
 }

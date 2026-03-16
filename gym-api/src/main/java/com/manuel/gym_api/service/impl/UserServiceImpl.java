@@ -1,6 +1,6 @@
 package com.manuel.gym_api.service.impl;
 
-import org.springframework.security.crypto.password.PasswordEncoder; // NUEVO
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

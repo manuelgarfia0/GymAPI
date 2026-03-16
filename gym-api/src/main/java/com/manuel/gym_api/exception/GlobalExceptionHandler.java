@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ import jakarta.persistence.PersistenceException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex) {
 		Map<String, Object> body = new HashMap<>();
@@ -27,7 +31,7 @@ public class GlobalExceptionHandler {
 		body.put("error", "Resource Not Found");
 
 		// Log para debugging
-		System.err.println("ResourceNotFoundException: " + ex.getMessage());
+		log.warn("Resource not found: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
 	}
@@ -41,7 +45,7 @@ public class GlobalExceptionHandler {
 		body.put("error", "Duplicate Resource");
 
 		// Log para debugging
-		System.err.println("DuplicateResourceException: " + ex.getMessage());
+		log.warn("Duplicate resource: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.CONFLICT);
 	}
@@ -60,7 +64,7 @@ public class GlobalExceptionHandler {
 		body.put("fieldErrors", fieldErrors);
 
 		// Log para debugging
-		System.err.println("Validation error: " + fieldErrors);
+		log.warn("Validation error: ", fieldErrors);
 
 		return ResponseEntity.badRequest().body(body);
 	}
@@ -75,7 +79,7 @@ public class GlobalExceptionHandler {
 		body.put("error", "Unauthorized");
 
 		// Log para debugging
-		System.err.println("BadCredentialsException: " + ex.getMessage());
+		log.warn("Bad credentials: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
 	}
@@ -90,13 +94,13 @@ public class GlobalExceptionHandler {
 		body.put("error", "Unauthorized");
 
 		// Log para debugging (no revelar que el usuario no existe)
-		System.err.println("UsernameNotFoundException: " + ex.getMessage());
+		log.warn("Username not found: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
 	}
 
 	// Manejo específico de errores de base de datos
-	@ExceptionHandler({DataAccessException.class, PersistenceException.class})
+	@ExceptionHandler({ DataAccessException.class, PersistenceException.class })
 	public ResponseEntity<Map<String, Object>> handleDatabaseException(Exception ex) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());
@@ -105,8 +109,7 @@ public class GlobalExceptionHandler {
 		body.put("error", "Service Unavailable");
 
 		// Log detallado para debugging
-		System.err.println("Database error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-		ex.printStackTrace();
+		log.error("Database error: {}", ex.getMessage(), ex);
 
 		return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
 	}
@@ -120,14 +123,14 @@ public class GlobalExceptionHandler {
 		body.put("error", "Internal Server Error");
 
 		// Log detallado para debugging
-		System.err.println("Unexpected error: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
-		ex.printStackTrace();
+		log.error("Unexpected error: {}", ex.getMessage(), ex);
 
 		// Proporcionar mensaje específico basado en el tipo de error
 		if (ex.getMessage() != null) {
 			if (ex.getMessage().toLowerCase().contains("connection")) {
 				body.put("message", "Database connection failed. Please check server configuration.");
-			} else if (ex.getMessage().toLowerCase().contains("jwt") || ex.getMessage().toLowerCase().contains("token")) {
+			} else if (ex.getMessage().toLowerCase().contains("jwt")
+					|| ex.getMessage().toLowerCase().contains("token")) {
 				body.put("message", "JWT token processing error. Please check authentication configuration.");
 			} else {
 				body.put("message", "An unexpected error occurred. Please contact support if the problem persists.");
