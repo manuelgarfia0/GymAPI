@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.RoutineDTO;
 import com.manuel.gym_api.model.User;
+import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.ProfileAccessService;
 import com.manuel.gym_api.service.RoutineService;
 
@@ -36,8 +37,8 @@ public class RoutineController {
 	@PostMapping
 	public ResponseEntity<RoutineDTO> createRoutine(@RequestBody @Valid RoutineDTO routineDTO,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
-		routineDTO.setUserId(currentUser.getId());
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		routineDTO.setUserId(principal.getId());
 		RoutineDTO createdRoutine = routineService.createRoutine(routineDTO);
 		return new ResponseEntity<>(createdRoutine, HttpStatus.CREATED);
 	}

@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.manuel.gym_api.repository.UserRepository;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +17,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SecurityFilter extends OncePerRequestFilter {
 
 	private final TokenService tokenService;
-	private final UserRepository userRepository;
+	private final AuthService authService;
 
-	public SecurityFilter(TokenService tokenService, UserRepository userRepository) {
+	public SecurityFilter(TokenService tokenService, AuthService authService) {
 		this.tokenService = tokenService;
-		this.userRepository = userRepository;
+		this.authService = authService;
 	}
 
 	@Override
@@ -38,7 +36,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
 			if (!username.isEmpty()) {
 				// Buscamos al usuario en la BD
-				UserDetails user = userRepository.findByUsername(username).orElse(null);
+				UserDetails user = authService.loadUserByUsername(username);
 
 				if (user != null) {
 					// Si existe, le decimos a Spring que el usuario está autenticado

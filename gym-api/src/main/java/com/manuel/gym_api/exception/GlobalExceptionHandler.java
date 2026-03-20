@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -112,6 +113,18 @@ public class GlobalExceptionHandler {
 		log.error("Database error: {}", ex.getMessage(), ex);
 
 		return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+
+	public ResponseEntity<Map<String, Object>> handleAccessDenied(
+
+			AccessDeniedException ex) {
+
+		// Re-lanzar para que Spring Security lo maneje
+
+		throw ex;
+
 	}
 
 	// Manejo de errores generales - ÚLTIMO RECURSO

@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.WorkoutDTO;
 import com.manuel.gym_api.model.User;
+import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.WorkoutService;
 
 import jakarta.validation.Valid;
@@ -74,8 +74,8 @@ public class WorkoutController {
 	}
 
 	// Para que Flutter pueda buscar por userId con query param
-	@GetMapping
-	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserIdParam(@RequestParam Long userId,
+	@GetMapping("/user/{userId}")
+	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserId(@PathVariable Long userId,
 			Authentication authentication) {
 		User currentUser = (User) authentication.getPrincipal();
 		if (!currentUser.getId().equals(userId)) {
@@ -87,9 +87,9 @@ public class WorkoutController {
 	// Flutter llama a PATCH /api/workouts/{id}/end
 	@PatchMapping("/{id}/end")
 	public ResponseEntity<WorkoutDTO> endWorkout(@PathVariable Long id, Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		WorkoutDTO workout = workoutService.getWorkoutById(id);
-		if (!workout.getUserId().equals(currentUser.getId())) {
+		if (!workout.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(workoutService.endWorkout(id));

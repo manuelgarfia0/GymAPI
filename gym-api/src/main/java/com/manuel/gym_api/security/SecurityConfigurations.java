@@ -22,9 +22,11 @@ public class SecurityConfigurations {
 	private final SecurityFilter securityFilter;
 	@Value("${cors.allowed-origins}")
 	private String allowedOrigins;
+	private final RateLimitFilter rateLimitFilter;
 
-	public SecurityConfigurations(SecurityFilter securityFilter) {
+	public SecurityConfigurations(SecurityFilter securityFilter, RateLimitFilter rateLimitFilter) {
 		this.securityFilter = securityFilter;
+		this.rateLimitFilter = rateLimitFilter;
 	}
 
 	@Bean
@@ -37,15 +39,13 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
 
-						// Permitir exercises temporalmente
-						.requestMatchers("/api/exercises").permitAll()
-
 						// REQUERIR JWT para /api/auth/me y otros endpoints protegidos
 						.requestMatchers("/api/auth/me").authenticated()
 
 						// Requerir autenticación para todo lo demás
 						.anyRequest().authenticated())
-				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
 
 	@Bean
@@ -59,14 +59,7 @@ public class SecurityConfigurations {
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
 		// Permitir headers específicos para autenticación JWT
-		configuration.setAllowedHeaders(Arrays.asList("*", // Permitir todos los headers
-				"Authorization", // Header JWT
-				"Content-Type", // Tipo de contenido
-				"Accept", // Aceptar respuesta
-				"Origin", // Origen de la petición
-				"Access-Control-Request-Method", // Método de la petición CORS
-				"Access-Control-Request-Headers" // Headers de la petición CORS
-		));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
 
 		// Exponer headers de respuesta necesarios
 		configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type", "Access-Control-Allow-Origin",

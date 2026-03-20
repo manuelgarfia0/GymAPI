@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public UserDTO registerUser(UserRegistrationDTO registrationDTO) {
+	public User registerUser(UserRegistrationDTO registrationDTO) {
 		if (userRepository.existsByEmail(registrationDTO.getEmail())) {
 			throw new DuplicateResourceException("Email is already in use");
 		}
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
 
 		User savedUser = userRepository.save(user);
-		return userMapper.toDTO(savedUser);
+		return userRepository.save(user);
 	}
 
 	@Override

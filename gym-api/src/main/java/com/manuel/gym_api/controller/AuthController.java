@@ -73,10 +73,8 @@ public class AuthController {
 	@PostMapping("/register")
 	public ResponseEntity<TokenDTO> register(@RequestBody @Valid UserRegistrationDTO registrationDTO) {
 		try {
-			userService.registerUser(registrationDTO);
+			User user = userService.registerUser(registrationDTO);
 
-			// Cargamos el User real para poder generar el token
-			User user = (User) authService.loadUserByUsername(registrationDTO.getUsername());
 			var token = tokenService.generateToken(user);
 
 			return ResponseEntity.ok(new TokenDTO(token));

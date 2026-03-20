@@ -41,6 +41,15 @@ public class TokenService {
 		}
 	}
 
+	public Long extractUserId(String token) {
+		try {
+			Algorithm algorithm = Algorithm.HMAC256(apiSecret);
+			return JWT.require(algorithm).withIssuer("GymAPI").build().verify(token).getClaim("id").asLong();
+		} catch (JWTVerificationException e) {
+			return null;
+		}
+	}
+
 	// El token durará 24 horas (puedes cambiarlo a lo que prefieras para la app
 	// móvil)
 	private Instant generateExpirationDate() {

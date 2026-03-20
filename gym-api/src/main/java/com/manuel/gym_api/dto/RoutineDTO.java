@@ -2,9 +2,16 @@ package com.manuel.gym_api.dto;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class RoutineDTO {
+
 	private Long id;
+	@NotBlank(message = "Routine name is required")
+	@Size(max = 100, message = "Name cannot exceed 100 characters")
 	private String name;
+	@Size(max = 500, message = "Description cannot exceed 500 characters")
 	private String description;
 	private Long userId;
 	private List<RoutineExerciseDTO> exercises;

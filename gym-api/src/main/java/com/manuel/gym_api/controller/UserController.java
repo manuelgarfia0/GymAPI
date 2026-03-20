@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.UserDTO;
-import com.manuel.gym_api.model.User;
+import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.UserService;
 
 @RestController
@@ -32,8 +32,8 @@ public class UserController {
 	@PutMapping("/{id}")
 	public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updateDTO,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
-		if (!currentUser.getId().equals(id)) {
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		if (!principal.getId().equals(id)) {
 			return ResponseEntity.status(403).build();
 		}
 		UserDTO updated = userService.updateUser(id, updateDTO);
