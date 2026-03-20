@@ -34,6 +34,7 @@ public class WorkoutController {
 	@PostMapping
 	public ResponseEntity<WorkoutDTO> createWorkout(@RequestBody @Valid WorkoutDTO workoutDTO,
 			Authentication authentication) {
+		// CORRECCIÓN: getPrincipal() devuelve UserPrincipal, no User
 		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		workoutDTO.setUserId(principal.getId());
 		WorkoutDTO createdWorkout = workoutService.createWorkout(workoutDTO);
@@ -72,7 +73,7 @@ public class WorkoutController {
 		return ResponseEntity.noContent().build();
 	}
 
-	// Para que Flutter pueda buscar por userId con query param
+	// GET /api/workouts/user/{userId} — path variable, no query param
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserId(@PathVariable Long userId,
 			Authentication authentication) {
