@@ -22,6 +22,7 @@ import com.manuel.gym_api.dto.UserRegistrationDTO;
 import com.manuel.gym_api.model.User;
 import com.manuel.gym_api.security.AuthService;
 import com.manuel.gym_api.security.TokenService;
+import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.UserService;
 
 import jakarta.validation.Valid;
@@ -88,8 +89,9 @@ public class AuthController {
 	public ResponseEntity<Map<String, Object>> getCurrentUser(Authentication authentication) {
 		try {
 			// Obtener el usuario autenticado desde el contexto de seguridad
-			if (authentication != null && authentication.getPrincipal() instanceof User) {
-				User user = (User) authentication.getPrincipal();
+			if (authentication != null && authentication.getPrincipal() instanceof UserPrincipal principal) {
+
+				User user = principal.getUser();
 
 				// Crear respuesta que coincida con lo que espera Flutter
 				Map<String, Object> response = new HashMap<>();

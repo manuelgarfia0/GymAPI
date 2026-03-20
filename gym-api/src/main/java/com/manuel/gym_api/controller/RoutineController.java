@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.RoutineDTO;
-import com.manuel.gym_api.model.User;
 import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.ProfileAccessService;
 import com.manuel.gym_api.service.RoutineService;
@@ -45,9 +44,9 @@ public class RoutineController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<RoutineDTO> getRoutineById(@PathVariable Long id, Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		RoutineDTO routine = routineService.getRoutineById(id);
-		if (!profileAccessService.canViewRoutines(currentUser.getId(), routine.getUserId())) {
+		if (!profileAccessService.canViewRoutines(principal.getId(), routine.getUserId())) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(routine);
@@ -56,8 +55,8 @@ public class RoutineController {
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<RoutineDTO>> getRoutinesByUserId(@PathVariable Long userId,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
-		if (!profileAccessService.canViewRoutines(currentUser.getId(), userId)) {
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		if (!profileAccessService.canViewRoutines(principal.getId(), userId)) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(routineService.getRoutinesByUserId(userId));
@@ -66,9 +65,9 @@ public class RoutineController {
 	@PutMapping("/{id}")
 	public ResponseEntity<RoutineDTO> updateRoutine(@PathVariable Long id, @RequestBody @Valid RoutineDTO routineDTO,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		RoutineDTO routine = routineService.getRoutineById(id);
-		if (!routine.getUserId().equals(currentUser.getId())) {
+		if (!routine.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(routineService.updateRoutine(id, routineDTO));
@@ -76,9 +75,9 @@ public class RoutineController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteRoutine(@PathVariable Long id, Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		RoutineDTO routine = routineService.getRoutineById(id);
-		if (!routine.getUserId().equals(currentUser.getId())) {
+		if (!routine.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		routineService.deleteRoutine(id);

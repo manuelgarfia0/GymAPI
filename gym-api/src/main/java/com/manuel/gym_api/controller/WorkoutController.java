@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.manuel.gym_api.dto.WorkoutDTO;
-import com.manuel.gym_api.model.User;
 import com.manuel.gym_api.security.UserPrincipal;
 import com.manuel.gym_api.service.WorkoutService;
 
@@ -35,17 +34,17 @@ public class WorkoutController {
 	@PostMapping
 	public ResponseEntity<WorkoutDTO> createWorkout(@RequestBody @Valid WorkoutDTO workoutDTO,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
-		workoutDTO.setUserId(currentUser.getId());
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		workoutDTO.setUserId(principal.getId());
 		WorkoutDTO createdWorkout = workoutService.createWorkout(workoutDTO);
 		return new ResponseEntity<>(createdWorkout, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<WorkoutDTO> getWorkoutById(@PathVariable Long id, Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		WorkoutDTO workout = workoutService.getWorkoutById(id);
-		if (!workout.getUserId().equals(currentUser.getId())) {
+		if (!workout.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(workout);
@@ -54,9 +53,9 @@ public class WorkoutController {
 	@PutMapping("/{id}")
 	public ResponseEntity<WorkoutDTO> updateWorkout(@PathVariable Long id, @RequestBody @Valid WorkoutDTO workoutDTO,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		WorkoutDTO workout = workoutService.getWorkoutById(id);
-		if (!workout.getUserId().equals(currentUser.getId())) {
+		if (!workout.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(workoutService.updateWorkout(id, workoutDTO));
@@ -64,9 +63,9 @@ public class WorkoutController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteWorkout(@PathVariable Long id, Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		WorkoutDTO workout = workoutService.getWorkoutById(id);
-		if (!workout.getUserId().equals(currentUser.getId())) {
+		if (!workout.getUserId().equals(principal.getId())) {
 			return ResponseEntity.status(403).build();
 		}
 		workoutService.deleteWorkout(id);
@@ -77,8 +76,8 @@ public class WorkoutController {
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<WorkoutDTO>> getWorkoutsByUserId(@PathVariable Long userId,
 			Authentication authentication) {
-		User currentUser = (User) authentication.getPrincipal();
-		if (!currentUser.getId().equals(userId)) {
+		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+		if (!principal.getId().equals(userId)) {
 			return ResponseEntity.status(403).build();
 		}
 		return ResponseEntity.ok(workoutService.getWorkoutsByUserId(userId));
