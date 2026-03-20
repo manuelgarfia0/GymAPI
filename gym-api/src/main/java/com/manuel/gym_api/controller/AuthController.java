@@ -58,7 +58,8 @@ public class AuthController {
 			Authentication auth = this.authenticationManager.authenticate(usernamePassword);
 
 			// Si todo fue bien, generamos nuestro JWT real
-			var token = tokenService.generateToken((User) auth.getPrincipal());
+			UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
+			var token = tokenService.generateToken(principal.getUser());
 
 			return ResponseEntity.ok(new TokenDTO(token));
 		} catch (DataAccessException e) {
