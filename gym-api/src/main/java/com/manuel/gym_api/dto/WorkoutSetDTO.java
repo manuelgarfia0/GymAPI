@@ -1,5 +1,7 @@
 package com.manuel.gym_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,7 +30,13 @@ public class WorkoutSetDTO {
 
 	private String notes;
 
+	// CORRECCIÓN: Jackson serializa isWarmup() como "warmup" (strips "is").
+	// Flutter envía "isWarmup". @JsonProperty fuerza el nombre correcto en
+	// ambas direcciones (serialización y deserialización).
+	@JsonProperty("isWarmup")
 	private boolean isWarmup;
+
+	@JsonProperty("isCompleted")
 	private boolean isCompleted;
 
 	public WorkoutSetDTO() {
@@ -50,7 +58,6 @@ public class WorkoutSetDTO {
 		this.exerciseId = exerciseId;
 	}
 
-	// GETTER Y SETTER PARA EL NOMBRE DEL EJERCICIO
 	public String getExerciseName() {
 		return exerciseName;
 	}
@@ -99,18 +106,22 @@ public class WorkoutSetDTO {
 		this.notes = notes;
 	}
 
+	@JsonProperty("isWarmup")
 	public boolean isWarmup() {
 		return isWarmup;
 	}
 
+	@JsonProperty("isWarmup")
 	public void setWarmup(boolean warmup) {
 		this.isWarmup = warmup;
 	}
 
+	@JsonProperty("isCompleted")
 	public boolean isCompleted() {
 		return isCompleted;
 	}
 
+	@JsonProperty("isCompleted")
 	public void setCompleted(boolean completed) {
 		this.isCompleted = completed;
 	}
