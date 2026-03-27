@@ -24,14 +24,23 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+	public ResponseEntity<UserDTO> getUser(@PathVariable Long id, Authentication authentication) {
 		UserDTO user = userService.getUserById(id);
+
+		// Si el perfil es privado, solo el propio usuario puede verlo
+		if (!user.isPublicProfile()) {
+			UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
+			if (!principal.getId().equals(id)) {
+				return ResponseEntity.status(403).build();
+			}
+		}
+
 		return ResponseEntity.ok(user);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO updateDTO,
-			Authentication authentication) {
+	                                          Authentication authentication) {
 		UserPrincipal principal = (UserPrincipal) authentication.getPrincipal();
 		if (!principal.getId().equals(id)) {
 			return ResponseEntity.status(403).build();
