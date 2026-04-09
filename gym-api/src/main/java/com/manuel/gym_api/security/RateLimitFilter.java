@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.HttpStatus;
@@ -20,61 +21,66 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-	private static final int MAX_BUCKETS = 10_000;
-	private static final long EVICTION_MS = 15 * 60 * 1_000L;
+    private static final int MAX_BUCKETS = 10_000;
+    private static final long EVICTION_MS = 15 * 60 * 1_000L;
+    private static final Set<String> RATE_LIMITED_PATHS = Set.of(
+            "/api/auth/login",
+            "/api/auth/register"
+    );
 
-	private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
-	private final Map<String, Long> lastSeen = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Map<String, Long> lastSeen = new ConcurrentHashMap<>();
 
-	private Bucket getBucket(String ip) {
-		lastSeen.put(ip, System.currentTimeMillis());
+    private Bucket getBucket(String ip) {
+        lastSeen.put(ip, System.currentTimeMillis());
 
-		// Evictar entradas antiguas si el mapa crece demasiado
-		if (buckets.size() > MAX_BUCKETS) {
-			evictStaleEntries();
-		}
+        if (buckets.size() > MAX_BUCKETS) {
+            evictStaleEntries();
+        }
 
-		return buckets.computeIfAbsent(ip, k ->
-				Bucket.builder()
-						.addLimit(Bandwidth.builder()
-								.capacity(10)
-								.refillIntervally(10, Duration.ofMinutes(15))
-								.build())
-						.build()
-		);
-	}
+        return buckets.computeIfAbsent(ip, k ->
+                Bucket.builder()
+                        .addLimit(Bandwidth.builder()
+                                .capacity(10)
+                                .refillIntervally(10, Duration.ofMinutes(15))
+                                .build())
+                        .build()
+        );
+    }
 
-	private void evictStaleEntries() {
-		long cutoff = System.currentTimeMillis() - EVICTION_MS;
-		Iterator<Map.Entry<String, Long>> it = lastSeen.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, Long> entry = it.next();
-			if (entry.getValue() < cutoff) {
-				buckets.remove(entry.getKey());
-				it.remove();
-			}
-		}
-	}
+    private void evictStaleEntries() {
+        long cutoff = System.currentTimeMillis() - EVICTION_MS;
+        Iterator<Map.Entry<String, Long>> it = lastSeen.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Long> entry = it.next();
+            if (entry.getValue() < cutoff) {
+                buckets.remove(entry.getKey());
+                it.remove();
+            }
+        }
+    }
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request,
-	                                HttpServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+    private boolean isRateLimited(HttpServletRequest request) {
+        return "POST".equals(request.getMethod())
+                && RATE_LIMITED_PATHS.contains(request.getRequestURI());
+    }
 
-		if ("/api/auth/login".equals(request.getRequestURI())
-				&& "POST".equals(request.getMethod())) {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-			String ip = request.getRemoteAddr();
+        if (isRateLimited(request)) {
+            String ip = request.getRemoteAddr();
+            if (!getBucket(ip).tryConsume(1)) {
+                response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+                response.setContentType("application/json");
+                response.getWriter().write(
+                        "{\"error\":\"Too many requests. Try again later.\"}");
+                return;
+            }
+        }
 
-			if (!getBucket(ip).tryConsume(1)) {
-				response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-				response.setContentType("application/json");
-				response.getWriter().write(
-						"{\"error\":\"Too many login attempts. Try again later.\"}");
-				return;
-			}
-		}
-
-		chain.doFilter(request, response);
-	}
+        chain.doFilter(request, response);
+    }
 }

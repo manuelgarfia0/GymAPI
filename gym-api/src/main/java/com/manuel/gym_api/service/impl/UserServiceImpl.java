@@ -16,61 +16,72 @@ import com.manuel.gym_api.service.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-	private final UserRepository userRepository;
-	private final UserMapper userMapper;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-	public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.userMapper = userMapper;
-		this.passwordEncoder = passwordEncoder;
-	}
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper,
+                           PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-	@Override
-	@Transactional
-	public User registerUser(UserRegistrationDTO registrationDTO) {
-		if (userRepository.existsByEmail(registrationDTO.getEmail())) {
-			throw new DuplicateResourceException("Email is already in use");
-		}
-		if (userRepository.existsByUsername(registrationDTO.getUsername())) {
-			throw new DuplicateResourceException("Username is already in use");
-		}
+    @Override
+    @Transactional
+    public User registerUser(UserRegistrationDTO registrationDTO) {
+        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new DuplicateResourceException("Email is already in use");
+        }
+        if (userRepository.existsByUsername(registrationDTO.getUsername())) {
+            throw new DuplicateResourceException("Username is already in use");
+        }
 
-		User user = new User();
-		user.setUsername(registrationDTO.getUsername());
-		user.setEmail(registrationDTO.getEmail());
+        User user = new User();
+        user.setUsername(registrationDTO.getUsername());
+        user.setEmail(registrationDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
 
-		user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        return userRepository.save(user);
+    }
 
-		return userRepository.save(user);
-	}
+    @Override
+    @Transactional(readOnly = true)
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        return userMapper.toDTO(user);
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	public UserDTO getUserById(Long id) {
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
-		return userMapper.toDTO(user);
-	}
+    @Override
+    @Transactional
+    public UserDTO updateUser(Long id, UserDTO updateDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
+            String newUsername = updateDTO.getUsername().trim();
+            if (!newUsername.equals(user.getUsername())
+                    && userRepository.existsByUsername(newUsername)) {
+                throw new DuplicateResourceException("Username is already in use");
+            }
+            user.setUsername(newUsername);
+        }
 
-	@Override
-	@Transactional
-	public UserDTO updateUser(Long id, UserDTO updateDTO) {
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        if (updateDTO.getEmail() != null && !updateDTO.getEmail().isBlank()) {
+            String newEmail = updateDTO.getEmail().trim();
+            if (!newEmail.equals(user.getEmail())
+                    && userRepository.existsByEmail(newEmail)) {
+                throw new DuplicateResourceException("Email is already in use");
+            }
+            user.setEmail(newEmail);
+        }
 
-		if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
-			user.setUsername(updateDTO.getUsername());
-		}
-		if (updateDTO.getEmail() != null && !updateDTO.getEmail().isBlank()) {
-			user.setEmail(updateDTO.getEmail());
-		}
-		if (updateDTO.getLanguagePreference() != null) {
-			user.setLanguagePreference(updateDTO.getLanguagePreference());
-		}
-		user.setPublicProfile(updateDTO.isPublicProfile());
+        if (updateDTO.getLanguagePreference() != null) {
+            user.setLanguagePreference(updateDTO.getLanguagePreference());
+        }
 
-		User savedUser = userRepository.save(user);
-		return userMapper.toDTO(savedUser);
-	}
+        user.setPublicProfile(updateDTO.isPublicProfile());
+
+        return userMapper.toDTO(userRepository.save(user));
+    }
 }

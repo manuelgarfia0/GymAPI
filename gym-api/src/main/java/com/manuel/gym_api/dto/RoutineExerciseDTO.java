@@ -1,56 +1,112 @@
 package com.manuel.gym_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
-// ignoreUnknown = true porque el cliente Flutter envía "targetWeight"
-// para uso interno (pre-rellenar pesos). El backend lo ignora deliberadamente.
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RoutineExerciseDTO {
-	private Long id;
-	private Long exerciseId;
-	private String exerciseName;
-	private Integer orderIndex;
-	private Integer sets;
-	private Integer reps;
-	private Integer restSeconds;
-	private String notes;
 
-	public RoutineExerciseDTO() {
-	}
+    private Long id;
 
-	public RoutineExerciseDTO(Long id, Long exerciseId, String exerciseName, Integer orderIndex, Integer sets,
-	                          Integer reps, Integer restSeconds, String notes) {
-		this.id = id;
-		this.exerciseId = exerciseId;
-		this.exerciseName = exerciseName;
-		this.orderIndex = orderIndex;
-		this.sets = sets;
-		this.reps = reps;
-		this.restSeconds = restSeconds;
-		this.notes = notes;
-	}
+    @NotNull(message = "Exercise ID is required")
+    private Long exerciseId;
 
-	public Long getId() { return id; }
-	public void setId(Long id) { this.id = id; }
+    private String exerciseName;
 
-	public Long getExerciseId() { return exerciseId; }
-	public void setExerciseId(Long exerciseId) { this.exerciseId = exerciseId; }
+    @NotNull(message = "Order index is required")
+    @Min(value = 1, message = "Order index must be at least 1")
+    private Integer orderIndex;
 
-	public String getExerciseName() { return exerciseName; }
-	public void setExerciseName(String exerciseName) { this.exerciseName = exerciseName; }
+    @NotNull(message = "Sets are required")
+    @Min(value = 1, message = "Sets must be at least 1")
+    private Integer sets;
 
-	public Integer getOrderIndex() { return orderIndex; }
-	public void setOrderIndex(Integer orderIndex) { this.orderIndex = orderIndex; }
+    @NotNull(message = "Reps are required")
+    @Min(value = 1, message = "Reps must be at least 1")
+    private Integer reps;
 
-	public Integer getSets() { return sets; }
-	public void setSets(Integer sets) { this.sets = sets; }
+    private Integer restSeconds = 90;
 
-	public Integer getReps() { return reps; }
-	public void setReps(Integer reps) { this.reps = reps; }
+    private String notes;
 
-	public Integer getRestSeconds() { return restSeconds; }
-	public void setRestSeconds(Integer restSeconds) { this.restSeconds = restSeconds; }
+    public RoutineExerciseDTO() {
+    }
 
-	public String getNotes() { return notes; }
-	public void setNotes(String notes) { this.notes = notes; }
+    public RoutineExerciseDTO(Long id, Long exerciseId, String exerciseName,
+                              Integer orderIndex, Integer sets, Integer reps,
+                              Integer restSeconds, String notes) {
+        this.id = id;
+        this.exerciseId = exerciseId;
+        this.exerciseName = exerciseName;
+        this.orderIndex = orderIndex;
+        this.sets = sets;
+        this.reps = reps;
+        this.restSeconds = (restSeconds != null) ? restSeconds : 90;
+        this.notes = notes;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getExerciseId() {
+        return exerciseId;
+    }
+
+    public void setExerciseId(Long exerciseId) {
+        this.exerciseId = exerciseId;
+    }
+
+    public String getExerciseName() {
+        return exerciseName;
+    }
+
+    public void setExerciseName(String exerciseName) {
+        this.exerciseName = exerciseName;
+    }
+
+    public Integer getOrderIndex() {
+        return orderIndex;
+    }
+
+    public void setOrderIndex(Integer orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public Integer getSets() {
+        return sets;
+    }
+
+    public void setSets(Integer sets) {
+        this.sets = sets;
+    }
+
+    public Integer getReps() {
+        return reps;
+    }
+
+    public void setReps(Integer reps) {
+        this.reps = reps;
+    }
+
+    public Integer getRestSeconds() {
+        return restSeconds;
+    }
+
+    public void setRestSeconds(Integer restSeconds) {
+        this.restSeconds = (restSeconds != null) ? restSeconds : 90;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 }
