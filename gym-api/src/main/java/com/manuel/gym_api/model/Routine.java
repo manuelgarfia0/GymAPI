@@ -36,6 +36,14 @@ public class Routine {
 	@OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<RoutineExercise> routineExercises = new ArrayList<>();
 
+	@Column(name = "created_at", updatable = false)
+	private java.time.LocalDateTime createdAt;
+
+	@jakarta.persistence.PrePersist
+	protected void onCreate() {
+		this.createdAt = java.time.LocalDateTime.now();
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -74,5 +82,13 @@ public class Routine {
 
 	public void setRoutineExercises(List<RoutineExercise> routineExercises) {
 		this.routineExercises = routineExercises;
+	}
+
+	public java.time.LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(java.time.LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 }

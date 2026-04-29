@@ -28,6 +28,8 @@ public class RoutineExerciseDTO {
 
     private Integer restSeconds = 90;
 
+    private Double targetWeight;
+
     private String notes;
 
     public RoutineExerciseDTO() {
@@ -35,7 +37,7 @@ public class RoutineExerciseDTO {
 
     public RoutineExerciseDTO(Long id, Long exerciseId, String exerciseName,
                               Integer orderIndex, Integer sets, Integer reps,
-                              Integer restSeconds, String notes) {
+                              Integer restSeconds, Double targetWeight, String notes) {
         this.id = id;
         this.exerciseId = exerciseId;
         this.exerciseName = exerciseName;
@@ -43,6 +45,7 @@ public class RoutineExerciseDTO {
         this.sets = sets;
         this.reps = reps;
         this.restSeconds = (restSeconds != null) ? restSeconds : 90;
+        this.targetWeight = targetWeight;
         this.notes = notes;
     }
 
@@ -100,6 +103,14 @@ public class RoutineExerciseDTO {
 
     public void setRestSeconds(Integer restSeconds) {
         this.restSeconds = (restSeconds != null) ? restSeconds : 90;
+    }
+
+    public Double getTargetWeight() {
+        return targetWeight;
+    }
+
+    public void setTargetWeight(Double targetWeight) {
+        this.targetWeight = targetWeight;
     }
 
     public String getNotes() {

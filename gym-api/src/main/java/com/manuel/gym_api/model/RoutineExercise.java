@@ -38,6 +38,9 @@ public class RoutineExercise {
     @Column(name = "rest_seconds", nullable = false, columnDefinition = "INTEGER DEFAULT 90")
     private Integer restSeconds = 90;
 
+    @Column(name = "target_weight")
+    private Double targetWeight;
+
     @Column(length = 255)
     private String notes;
 
@@ -95,6 +98,14 @@ public class RoutineExercise {
 
     public void setRestSeconds(Integer restSeconds) {
         this.restSeconds = (restSeconds != null) ? restSeconds : 90;
+    }
+
+    public Double getTargetWeight() {
+        return targetWeight;
+    }
+
+    public void setTargetWeight(Double targetWeight) {
+        this.targetWeight = targetWeight;
     }
 
     public String getNotes() {

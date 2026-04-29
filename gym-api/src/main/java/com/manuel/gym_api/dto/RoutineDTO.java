@@ -15,16 +15,18 @@ public class RoutineDTO {
 	private String description;
 	private Long userId;
 	private List<RoutineExerciseDTO> exercises;
+	private String createdAt;
 
 	public RoutineDTO() {
 	}
 
-	public RoutineDTO(Long id, String name, String description, Long userId, List<RoutineExerciseDTO> exercises) {
+	public RoutineDTO(Long id, String name, String description, Long userId, List<RoutineExerciseDTO> exercises, String createdAt) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.userId = userId;
 		this.exercises = exercises;
+		this.createdAt = createdAt;
 	}
 
 	public Long getId() {
@@ -65,5 +67,13 @@ public class RoutineDTO {
 
 	public void setExercises(List<RoutineExerciseDTO> exercises) {
 		this.exercises = exercises;
+	}
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(String createdAt) {
+		this.createdAt = createdAt;
 	}
 }

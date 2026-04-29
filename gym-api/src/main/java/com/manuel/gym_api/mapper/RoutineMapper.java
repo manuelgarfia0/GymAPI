@@ -24,8 +24,10 @@ public class RoutineMapper {
 				? routine.getRoutineExercises().stream().map(this::toExerciseDTO).collect(Collectors.toList())
 				: Collections.emptyList();
 
+		String createdAtStr = routine.getCreatedAt() != null ? routine.getCreatedAt().toString() : null;
+
 		return new RoutineDTO(routine.getId(), routine.getName(), routine.getDescription(), routine.getUser().getId(),
-				exercisesDTO);
+				exercisesDTO, createdAtStr);
 	}
 
 	public RoutineExerciseDTO toExerciseDTO(RoutineExercise entity) {
@@ -36,7 +38,7 @@ public class RoutineMapper {
 		String exerciseName = (entity.getExercise() != null) ? entity.getExercise().getName() : null;
 
 		return new RoutineExerciseDTO(entity.getId(), entity.getExercise().getId(), exerciseName,
-				entity.getOrderIndex(), entity.getSets(), entity.getReps(), entity.getRestSeconds(), entity.getNotes());
+				entity.getOrderIndex(), entity.getSets(), entity.getReps(), entity.getRestSeconds(), entity.getTargetWeight(), entity.getNotes());
 	}
 
 	public Routine toEntity(RoutineDTO dto, User user) {
@@ -55,6 +57,7 @@ public class RoutineMapper {
 		entity.setSets(dto.getSets());
 		entity.setReps(dto.getReps());
 		entity.setRestSeconds(dto.getRestSeconds());
+		entity.setTargetWeight(dto.getTargetWeight());
 		entity.setNotes(dto.getNotes());
 		return entity;
 	}
