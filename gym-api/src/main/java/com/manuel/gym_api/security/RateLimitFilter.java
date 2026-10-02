@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
             "/api/auth/login",
             "/api/auth/register"
     );
+    @Value("${api.rate-limit.capacity:10}")
+    private int capacity;
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final Map<String, Long> lastSeen = new ConcurrentHashMap<>();
@@ -41,8 +44,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
         return buckets.computeIfAbsent(ip, k ->
                 Bucket.builder()
                         .addLimit(Bandwidth.builder()
-                                .capacity(10)
-                                .refillIntervally(10, Duration.ofMinutes(15))
+                                .capacity(capacity)
+                                .refillIntervally(capacity, Duration.ofMinutes(15))
                                 .build())
                         .build()
         );
