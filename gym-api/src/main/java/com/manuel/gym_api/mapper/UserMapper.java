@@ -20,6 +20,9 @@ public class UserMapper {
 			result.setPublicProfile(user.isPublicProfile());
 			result.setLanguagePreference(user.getLanguagePreference());
 			result.setCreatedAt(user.getCreatedAt());
+			result.setFirstName(user.getFirstName());
+			result.setLastName(user.getLastName());
+			result.setDateOfBirth(user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null);
 		}
 
 		return result;

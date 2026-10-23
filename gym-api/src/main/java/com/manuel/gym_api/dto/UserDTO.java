@@ -1,5 +1,6 @@
 package com.manuel.gym_api.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +14,9 @@ public class UserDTO {
 	private String languagePreference;
 	private LocalDateTime createdAt;
 	private boolean publicProfile;
+	private String firstName;
+	private String lastName;
+	private String dateOfBirth; // Se serializa como String ISO-8601 (yyyy-MM-dd) para Flutter
 
 	// Getters y Setters
 	public Long getId() {
@@ -63,12 +67,35 @@ public class UserDTO {
 		this.createdAt = createdAt;
 	}
 
-	// Nuevos métodos para publicProfile
 	public boolean isPublicProfile() {
 		return publicProfile;
 	}
 
 	public void setPublicProfile(boolean publicProfile) {
 		this.publicProfile = publicProfile;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(String dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 }

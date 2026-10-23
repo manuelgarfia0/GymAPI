@@ -1,5 +1,6 @@
 package com.manuel.gym_api.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -38,6 +39,15 @@ public class User {
 
 	@Column(nullable = false)
 	private boolean publicProfile = true;
+
+	@Column(name = "first_name", length = 50)
+	private String firstName;
+
+	@Column(name = "last_name", length = 50)
+	private String lastName;
+
+	@Column(name = "date_of_birth")
+	private LocalDate dateOfBirth;
 
 	@PrePersist
 	protected void onCreate() {
@@ -101,6 +111,30 @@ public class User {
 
 	public void setPublicProfile(boolean publicProfile) {
 		this.publicProfile = publicProfile;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public LocalDate getDateOfBirth() {
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(LocalDate dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 
 	public LocalDateTime getCreatedAt() {
