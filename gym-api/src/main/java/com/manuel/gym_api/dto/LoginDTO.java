@@ -1,10 +1,12 @@
 package com.manuel.gym_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginDTO {
 
-	@NotBlank(message = "Username is required")
+	@NotBlank(message = "Username or email is required")
+	@JsonAlias({ "email", "identifier", "login" })
 	private String username;
 
 	@NotBlank(message = "Password is required")

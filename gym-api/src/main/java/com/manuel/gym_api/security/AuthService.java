@@ -17,8 +17,11 @@ public class AuthService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return userRepository.findByUsername(username).map(UserPrincipal::new)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+	public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+		String trimmed = identifier != null ? identifier.trim() : "";
+		return userRepository.findByUsernameIgnoreCase(trimmed)
+				.or(() -> userRepository.findByEmailIgnoreCase(trimmed))
+				.map(UserPrincipal::new)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found with username or email: " + identifier));
 	}
 }
