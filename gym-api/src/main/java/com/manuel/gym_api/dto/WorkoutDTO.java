@@ -3,10 +3,13 @@ package com.manuel.gym_api.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WorkoutDTO {
 
 	private Long id;

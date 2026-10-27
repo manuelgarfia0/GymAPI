@@ -1,5 +1,8 @@
 package com.manuel.gym_api.service.impl;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +81,26 @@ public class UserServiceImpl implements UserService {
 
         if (updateDTO.getLanguagePreference() != null) {
             user.setLanguagePreference(updateDTO.getLanguagePreference());
+        }
+
+        if (updateDTO.getFirstName() != null) {
+            user.setFirstName(updateDTO.getFirstName().trim());
+        }
+
+        if (updateDTO.getLastName() != null) {
+            user.setLastName(updateDTO.getLastName().trim());
+        }
+
+        if (updateDTO.getDateOfBirth() != null) {
+            if (updateDTO.getDateOfBirth().isBlank()) {
+                user.setDateOfBirth(null);
+            } else {
+                try {
+                    user.setDateOfBirth(LocalDate.parse(updateDTO.getDateOfBirth().trim()));
+                } catch (DateTimeParseException e) {
+                    throw new IllegalArgumentException("Invalid date format for dateOfBirth. Expected YYYY-MM-DD", e);
+                }
+            }
         }
 
         user.setPublicProfile(updateDTO.isPublicProfile());

@@ -1,10 +1,11 @@
 package com.manuel.gym_api.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
 	private Long id;
 	private String username;
@@ -17,6 +18,9 @@ public class UserDTO {
 	private String firstName;
 	private String lastName;
 	private String dateOfBirth; // Se serializa como String ISO-8601 (yyyy-MM-dd) para Flutter
+
+	public UserDTO() {
+	}
 
 	// Getters y Setters
 	public Long getId() {

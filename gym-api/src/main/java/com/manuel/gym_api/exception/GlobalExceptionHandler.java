@@ -31,7 +31,6 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.NOT_FOUND.value());
 		body.put("error", "Resource Not Found");
 
-		// Log para debugging
 		log.warn("Resource not found: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
@@ -45,7 +44,6 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.CONFLICT.value());
 		body.put("error", "Duplicate Resource");
 
-		// Log para debugging
 		log.warn("Duplicate resource: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.CONFLICT);
@@ -64,8 +62,20 @@ public class GlobalExceptionHandler {
 		body.put("error", "Bad Request");
 		body.put("fieldErrors", fieldErrors);
 
-		// Log para debugging
-		log.warn("Validation error: ", fieldErrors);
+		log.warn("Validation error: {}", fieldErrors);
+
+		return ResponseEntity.badRequest().body(body);
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
+		Map<String, Object> body = new HashMap<>();
+		body.put("timestamp", LocalDateTime.now());
+		body.put("message", ex.getMessage());
+		body.put("status", HttpStatus.BAD_REQUEST.value());
+		body.put("error", "Bad Request");
+
+		log.warn("Illegal argument: {}", ex.getMessage());
 
 		return ResponseEntity.badRequest().body(body);
 	}
@@ -79,7 +89,6 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.UNAUTHORIZED.value());
 		body.put("error", "Unauthorized");
 
-		// Log para debugging
 		log.warn("Bad credentials: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
@@ -94,7 +103,6 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.UNAUTHORIZED.value());
 		body.put("error", "Unauthorized");
 
-		// Log para debugging (no revelar que el usuario no existe)
 		log.warn("Username not found: {}", ex.getMessage());
 
 		return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
@@ -109,22 +117,14 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
 		body.put("error", "Service Unavailable");
 
-		// Log detallado para debugging
 		log.error("Database error: {}", ex.getMessage(), ex);
 
 		return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
-
-	public ResponseEntity<Map<String, Object>> handleAccessDenied(
-
-			AccessDeniedException ex) {
-
-		// Re-lanzar para que Spring Security lo maneje
-
+	public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
 		throw ex;
-
 	}
 
 	// Manejo de errores generales - ÚLTIMO RECURSO
@@ -135,10 +135,8 @@ public class GlobalExceptionHandler {
 		body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
 		body.put("error", "Internal Server Error");
 
-		// Log detallado para debugging
 		log.error("Unexpected error: {}", ex.getMessage(), ex);
 
-		// Proporcionar mensaje específico basado en el tipo de error
 		if (ex.getMessage() != null) {
 			if (ex.getMessage().toLowerCase().contains("connection")) {
 				body.put("message", "Database connection failed. Please check server configuration.");

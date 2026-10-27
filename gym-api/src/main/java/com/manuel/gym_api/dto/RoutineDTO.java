@@ -2,9 +2,12 @@ package com.manuel.gym_api.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoutineDTO {
 
 	private Long id;
