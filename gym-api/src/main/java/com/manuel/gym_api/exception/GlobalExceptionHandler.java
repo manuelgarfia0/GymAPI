@@ -55,9 +55,14 @@ public class GlobalExceptionHandler {
 		ex.getBindingResult().getFieldErrors()
 				.forEach(error -> fieldErrors.put(error.getField(), error.getDefaultMessage()));
 
+		// Mensaje específico: usar el primer error de validación detectado
+		String specificMessage = fieldErrors.values().stream()
+				.findFirst()
+				.orElse("Error de validación en los datos enviados");
+
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());
-		body.put("message", "Validation failed");
+		body.put("message", specificMessage);
 		body.put("status", HttpStatus.BAD_REQUEST.value());
 		body.put("error", "Bad Request");
 		body.put("fieldErrors", fieldErrors);
@@ -80,12 +85,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(body);
 	}
 
-	// Manejo específico de errores de autenticación
+	// Manejo específico de credenciales incorrectas
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<Map<String, Object>> handleBadCredentialsException(BadCredentialsException ex) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());
-		body.put("message", "Invalid username or password");
+		body.put("message", "Usuario o contraseña incorrectos");
 		body.put("status", HttpStatus.UNAUTHORIZED.value());
 		body.put("error", "Unauthorized");
 
@@ -99,7 +104,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Map<String, Object>> handleUsernameNotFoundException(UsernameNotFoundException ex) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());
-		body.put("message", "Invalid username or password");
+		body.put("message", "Usuario o contraseña incorrectos");
 		body.put("status", HttpStatus.UNAUTHORIZED.value());
 		body.put("error", "Unauthorized");
 
@@ -113,7 +118,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Map<String, Object>> handleDatabaseException(Exception ex) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("timestamp", LocalDateTime.now());
-		body.put("message", "Database connection error. Please try again later.");
+		body.put("message", "Error de conexión con la base de datos. Por favor, inténtalo más tarde.");
 		body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
 		body.put("error", "Service Unavailable");
 
@@ -139,15 +144,15 @@ public class GlobalExceptionHandler {
 
 		if (ex.getMessage() != null) {
 			if (ex.getMessage().toLowerCase().contains("connection")) {
-				body.put("message", "Database connection failed. Please check server configuration.");
+				body.put("message", "Fallo de conexión con la base de datos. Verifica la configuración del servidor.");
 			} else if (ex.getMessage().toLowerCase().contains("jwt")
 					|| ex.getMessage().toLowerCase().contains("token")) {
-				body.put("message", "JWT token processing error. Please check authentication configuration.");
+				body.put("message", "Error procesando el token de sesión. Vuelve a iniciar sesión.");
 			} else {
-				body.put("message", "An unexpected error occurred. Please contact support if the problem persists.");
+				body.put("message", "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.");
 			}
 		} else {
-			body.put("message", "An unexpected error occurred. Please contact support if the problem persists.");
+			body.put("message", "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.");
 		}
 
 		return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);

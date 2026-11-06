@@ -34,15 +34,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User registerUser(UserRegistrationDTO registrationDTO) {
         if (userRepository.existsByEmail(registrationDTO.getEmail())) {
-            throw new DuplicateResourceException("Email is already in use");
+            throw new DuplicateResourceException("El correo electrónico ya está registrado");
         }
         if (userRepository.existsByUsername(registrationDTO.getUsername())) {
-            throw new DuplicateResourceException("Username is already in use");
+            throw new DuplicateResourceException("El nombre de usuario ya está en uso");
         }
 
         User user = new User();
-        user.setUsername(registrationDTO.getUsername());
-        user.setEmail(registrationDTO.getEmail());
+        user.setUsername(registrationDTO.getUsername().trim());
+        user.setEmail(registrationDTO.getEmail().trim());
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
 
         return userRepository.save(user);
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
         return userMapper.toDTO(user);
     }
 
@@ -60,12 +60,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(Long id, UserDTO updateDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
         if (updateDTO.getUsername() != null && !updateDTO.getUsername().isBlank()) {
             String newUsername = updateDTO.getUsername().trim();
             if (!newUsername.equals(user.getUsername())
                     && userRepository.existsByUsername(newUsername)) {
-                throw new DuplicateResourceException("Username is already in use");
+                throw new DuplicateResourceException("El nombre de usuario ya está en uso");
             }
             user.setUsername(newUsername);
         }
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
             String newEmail = updateDTO.getEmail().trim();
             if (!newEmail.equals(user.getEmail())
                     && userRepository.existsByEmail(newEmail)) {
-                throw new DuplicateResourceException("Email is already in use");
+                throw new DuplicateResourceException("El correo electrónico ya está registrado");
             }
             user.setEmail(newEmail);
         }
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
                 try {
                     user.setDateOfBirth(LocalDate.parse(updateDTO.getDateOfBirth().trim()));
                 } catch (DateTimeParseException e) {
-                    throw new IllegalArgumentException("Invalid date format for dateOfBirth. Expected YYYY-MM-DD", e);
+                    throw new IllegalArgumentException("Formato de fecha inválido. Formato esperado: YYYY-MM-DD", e);
                 }
             }
         }
